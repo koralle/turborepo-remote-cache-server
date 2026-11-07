@@ -41,6 +41,8 @@ Chrome DevTools Protocol の `WebAuthn.addVirtualAuthenticator`（ctap2 / intern
 | `./e2e/run.sh` | 成功（初回ミス→保存、出力削除から復元、ソース変更でミス、署名不一致の不採用） |
 | `./scripts/check-migrations.sh HEAD` | 成功（既存 SQL の変更なし） |
 | `pnpm spec:update` | 成功（sha256 `d6ec728d…` を再記録） |
+| `wrangler deploy --dry-run`（API） | 成功（D1 / R2 / vars の binding を解決） |
+| `wrangler deploy --dry-run`（Web） | 成功（API の Service Binding / vars を解決） |
 
 ## 未検証
 
