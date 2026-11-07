@@ -21,11 +21,9 @@
     "@repo/db": "workspace:*",
     "better-auth": "catalog:auth",
     "drizzle-orm": "catalog:db",
-    "hono": "catalog:api",
-    "valibot": "catalog:api"
+    "hono": "catalog:api"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "catalog:cloudflare",
     "@repo/forge": "workspace:*",
     "wrangler": "catalog:cloudflare"
   }
