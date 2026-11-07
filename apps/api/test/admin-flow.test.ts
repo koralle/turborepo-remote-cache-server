@@ -5,9 +5,7 @@ import { eq } from "drizzle-orm";
 import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 
-import { call, db, seedUser } from "./helpers.ts";
-
-const origin = "http://localhost:3000";
+import { call, db, seedUser, testOrigin as origin } from "./helpers.ts";
 
 // Better Auth はセッション Cookie を HMAC で署名する。内部形式に合わせてテストで再現する。
 const signCookie = async (value: string): Promise<string> => {

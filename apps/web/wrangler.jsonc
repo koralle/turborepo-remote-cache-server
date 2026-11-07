@@ -12,8 +12,4 @@
       "service": "turbo-remote-cache-api",
     },
   ],
-  "vars": {
-    "BETTER_AUTH_URL": "http://localhost:3000",
-    "WEB_ORIGIN": "http://localhost:3000",
-  },
 }

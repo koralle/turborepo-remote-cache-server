@@ -24,9 +24,7 @@ export default defineConfig({
             miniflare: {
               bindings: {
                 BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret",
-                BETTER_AUTH_URL: "http://localhost:3000",
                 MAX_ARTIFACT_BYTES: "16",
-                WEB_ORIGIN: "http://localhost:3000",
               },
             },
             wrangler: { configPath: "./apps/api/wrangler.jsonc" },

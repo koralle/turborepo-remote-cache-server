@@ -25,12 +25,14 @@ describe("admin:setup", () => {
     expect(result.stdout).toContain("http://localhost:3000/setup#token=");
   });
 
-  it("WEB_ORIGIN が無ければ失敗する", () => {
+  it("WEB_ORIGIN が無ければ portless の開発 URL を使う", () => {
     const result = run({
       BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret",
     });
 
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain("WEB_ORIGIN");
+    expect(result.status).toBe(0);
+    expect(result.stdout).toMatch(
+      /https:\/\/.*turbo-cache\.localhost\/setup#token=/u
+    );
   });
 });

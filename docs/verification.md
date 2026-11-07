@@ -17,6 +17,20 @@
 
 Web の server entry が `/v8` と `/artifacts` を Service Binding で API に転送するため、ローカル CLI は port 3000 で接続できる。
 
+## portless（追記）
+
+443 と証明書を触らずに確認するため `PORTLESS_HTTPS=0 PORTLESS_PORT=8080` で実行した（`--name turbo-cache` は `apps/web/package.json` の `dev` と同じ）。
+
+| 操作 | 結果 |
+| --- | --- |
+| 起動ログ | `PORT=4833 … PORTLESS_URL=http://implement-poc.turbo-cache.localhost:8080 vite --config vite.app.config.ts --port 4833 --strictPort --host 127.0.0.1`（url は worktree のブランチ名が前置される） |
+| `GET /api/auth/passkey/generate-authenticate-options`（プロキシ経由） | 200（`rpId: "implement-poc.turbo-cache.localhost"`）。Service Binding 越しでもリクエストのオリジンが保たれる |
+| 同（Vite 直 `127.0.0.1:4833`） | 200（`rpId: "127.0.0.1"`）。オリジンはリクエストから求まる |
+| `GET /` | 200 |
+| `ws://…/`（`vite-hmr`） | 接続成立（HMR の WebSocket もプロキシを通る） |
+| `GET /v8/artifacts/status` / `PUT /v8/artifacts/abc123` / 同 `GET` | 200 / 202 / 200（seed 済み API キー） |
+| `pnpm test` / `pnpm typecheck` / `pnpm run types` / Oxlint / Oxfmt / Knip | 成功（51 テスト） |
+
 ## ブラウザ（Chrome 仮想認証器）
 
 Chrome DevTools Protocol の `WebAuthn.addVirtualAuthenticator`（ctap2 / internal / resident key）を使い、実ブラウザで次を確認した。
@@ -48,6 +62,8 @@ Chrome DevTools Protocol の `WebAuthn.addVirtualAuthenticator`（ctap2 / intern
 
 ## 未検証
 
+- portless の既定構成（443 + ローカル CA）でのブラウザ操作とパスキーの登録・ログイン。
+- `./e2e/dev-smoke.sh`（port 3000 が他プロセスで使用中だったため未実行）。
 - GitHub Actions 上での実行（git remote が未設定）。
 - 本番 Cloudflare へのデプロイ（有料リソース作成の承認待ち）。
 - push / PR 作成（remote 未設定）。

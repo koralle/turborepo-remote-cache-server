@@ -14,6 +14,7 @@ import * as v from "valibot";
 
 import { createAuth } from "./auth.ts";
 import type { AppEnv } from "./env.ts";
+import { originOf } from "./env.ts";
 
 const defaultMaxBytes = 100 * 1024 * 1024;
 const maxBatchHashes = 100;
@@ -147,7 +148,7 @@ export const createCacheRoutes = () => {
       return c.json(errorBody("unauthorized", "Bearer トークンが必要"), 401);
     }
 
-    const auth = createAuth(env);
+    const auth = createAuth(env, originOf(env, c.req.raw));
 
     const result = await auth.api
       .verifyApiKey({ body: { key: token, permissions: required } })

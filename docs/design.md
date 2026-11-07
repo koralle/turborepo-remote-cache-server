@@ -118,9 +118,9 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 ## 6. 公開経路
 
 - **本番（想定）**: API Worker を `cache.<domain>`（カスタムドメイン）または `<name>.<account>.workers.dev` に公開。`TURBO_API=https://cache.<domain>`、`TURBO_TOKEN=<API キー>`、`TURBO_TEAM=<リポジトリ slug>`。
-- **ローカル**: Web は Vite の port 3000 + `strictPort`。API は Vite の `auxiliaryWorkers` で同時起動する。Web が `/v8` と `/artifacts` も Service Binding で API に転送するため、`TURBO_API=http://localhost:3000` で CLI から到達できる。D1 は Vite の永続化先 `apps/web/.wrangler/state/v3` を使い、`pnpm dev` が起動前にマイグレーションする。API 単体や E2E は `apps/api/.wrangler/state/v3` を使う。
+- **ローカル**: Web は portless 経由で `https://<branch>.turbo-cache.localhost`（ポートは 4000-4999 から自動割当）。API は Vite の `auxiliaryWorkers` で同時起動する。Web が `/v8` と `/artifacts` も Service Binding で API に転送するため、`TURBO_API=https://turbo-cache.localhost` で CLI から到達できる。D1 は Vite の永続化先 `apps/web/.wrangler/state/v3` を使い、`pnpm dev` が起動前にマイグレーションする。API 単体や E2E は `apps/api/.wrangler/state/v3` を使う。`PORTLESS=0 pnpm dev` で port 3000 の従来動作に戻る。
 - ブラウザからは Web の同一オリジンのみ。`/api/auth/*` と `/rpc/*` を Service Binding（`env.API.fetch`）で API に転送し、Cookie と `Set-Cookie` をそのまま通す。
-- API Worker の `baseURL` は Web のオリジン。`trustedOrigins` も Web のオリジン。Cookie は `HttpOnly`、`SameSite=Lax`、本番は `Secure`。
+- API Worker の `baseURL` は Web のオリジン。`trustedOrigins` も Web のオリジン。本番は `WEB_ORIGIN` に固定し、ローカルは `WEB_ORIGIN` を空にしてリクエストのオリジン（portless の URL）を都度使う。Cookie は `HttpOnly`、`SameSite=Lax`、本番は `Secure`。
 - oRPC の変更系は `Origin` ヘッダー一致を追加で確認する。
 - Turborepo CLI はブラウザではないので CORS は必須ではないが、プリフライトを送る構成でも動くようキャッシュ経路に OPTIONS を実装する。
 - 公開経路の検証: `curl` で Authorization・`Content-Length`・`x-artifact-tag` が往復すること、実 Turborepo で保存・復元できることを確認する。
@@ -176,7 +176,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 
 | コマンド | 内容 |
 | --- | --- |
-| `dev` | Web（port 3000, strictPort）+ API auxiliary Worker |
+| `dev` | Web（portless）+ API auxiliary Worker |
 | `build` | API / Web |
 | `test` | Vitest（node + workers） |
 | `typecheck` | tsrs --noEmit |

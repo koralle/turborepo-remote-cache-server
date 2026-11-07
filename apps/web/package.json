@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.app.config.ts",
+    "dev": "portless run --name turbo-cache vite --config vite.app.config.ts",
     "build": "panda codegen && vite build --config vite.app.config.ts",
     "preview": "vite preview --config vite.app.config.ts",
     "deploy": "pnpm run build && wrangler deploy",
@@ -41,6 +41,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "catalog:react",
+    "portless": "catalog:tooling",
     "storybook": "catalog:ui",
     "vite": "catalog:cloudflare",
     "wrangler": "catalog:cloudflare"

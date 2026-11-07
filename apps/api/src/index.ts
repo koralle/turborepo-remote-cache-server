@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { createAuth } from "./auth.ts";
 import { createCacheRoutes } from "./cache.ts";
 import type { AppEnv } from "./env.ts";
+import { originOf } from "./env.ts";
 import { createRpcHandler } from "./rpc.ts";
 
 const app = new Hono<{ Bindings: AppEnv }>();
@@ -18,11 +19,12 @@ app.route("/", cache);
 app.on(
   ["GET", "POST"],
   "/api/auth/*",
-  async (c) => await createAuth(c.env).handler(c.req.raw)
+  async (c) =>
+    await createAuth(c.env, originOf(c.env, c.req.raw)).handler(c.req.raw)
 );
 
 app.use("/rpc/*", async (c, next) => {
-  const handler = createRpcHandler(c.env);
+  const handler = createRpcHandler(c.env, originOf(c.env, c.req.raw));
 
   const { matched, response } = await handler.handle(c.req.raw, {
     prefix: "/rpc",

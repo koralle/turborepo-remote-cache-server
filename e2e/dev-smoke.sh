@@ -24,8 +24,8 @@ trap cleanup EXIT
 
 log() { printf '\n=== %s ===\n' "$1"; }
 
-log "pnpm dev を起動"
-pnpm dev >/tmp/turbo-cache-dev-smoke.log 2>&1 &
+log "pnpm dev を起動（portless を介さず port 3000 で確認する）"
+PORTLESS=0 pnpm dev >/tmp/turbo-cache-dev-smoke.log 2>&1 &
 dev_pid=$!
 for _ in $(seq 1 90); do
   if curl -fsS http://localhost:3000/ >/dev/null 2>&1; then break; fi

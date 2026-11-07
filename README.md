@@ -34,22 +34,25 @@ pnpm install --frozen-lockfile
 pnpm run types          # wrangler types（binding 型）
 cp apps/api/.dev.vars.example apps/api/.dev.vars
 # BETTER_AUTH_SECRET を openssl rand -base64 32 などで設定
-pnpm dev                # ローカル D1 を migrate し、Web (3000) + API auxiliary Worker を起動
-pnpm admin:setup        # 管理者のメールアドレスを入力し、パスキー登録 URL を表示
+pnpm dev                # ローカル D1 を migrate し、Web を portless 経由で起動する
+pnpm admin:setup        # パスキー登録 URL を表示
 ```
 
-`pnpm dev` は Vite の port 3000（`strictPort`）で Web を起動し、`apps/api` の Worker を同時に起動する。
+`pnpm dev` は Vite（`apps/web`）を [portless](https://portless.sh/) 経由で起動し、`apps/api` の Worker を同時に起動する。
+URL は `https://turbo-cache.localhost`（git worktree では `https://<ブランチ名最終セグメント>.turbo-cache.localhost`）。ポートは固定せず 4000-4999 から自動で割り当てるので、複数 worktree を同時に起動しても衝突しない。実際の URL は起動ログの `PORTLESS_URL` に出る。
+初回起動時のみ 443 のバインド（sudo）とローカル CA の信頼が入る。`PORTLESS=0 pnpm dev` で portless を迂回し、port 3000 で起動できる（`e2e/dev-smoke.sh` はこちら）。
 D1 は `apps/web/.wrangler/state/v3` に保存し、`pnpm dev` が起動前にマイグレーションする。
-`pnpm db:migrate` は API 単体（`wrangler dev`）と E2E 用で、`apps/api/.wrangler` 側を使う。ブラウザで `http://localhost:3000/setup#token=...` を開き、パスキーを登録してログインする。
-ローカルの Turborepo は `TURBO_API=http://localhost:3000`（Web が `/v8` を Service Binding で転送）で接続できる。
+`pnpm db:migrate` は API 単体（`wrangler dev`）と E2E 用で、`apps/api/.wrangler` 側を使う。ブラウザで `<URL>/setup#token=...` を開き、パスキーを登録してログインする。
+ローカルの Turborepo は `TURBO_API=https://turbo-cache.localhost`（Web が `/v8` を Service Binding で転送）で接続できる。
+
+パスキーはオリジン（ホスト名）に紐づくため、worktree ごとに登録し直す。
 
 ## 環境変数と Secret
 
 | 名前 | 用途 |
 | --- | --- |
 | `BETTER_AUTH_SECRET` | Better Auth の署名鍵。Secret（`.dev.vars` / `wrangler secret`）。CLI は環境変数から読む |
-| `BETTER_AUTH_URL` | ブラウザから見た Web のオリジン（例 `https://admin.example.com`） |
-| `WEB_ORIGIN` | Web のオリジン。Cookie / WebAuthn / Origin 検査に使う |
+| `WEB_ORIGIN` | Web のオリジン。Cookie / WebAuthn / Origin 検査に使う。本番のみ固定値（`prepare-production-config` が書き込む）。ローカルは空で、リクエストのオリジン（portless の URL）を都度使う。`pnpm admin:setup` は未設定なら portless と同じ規則で開発中の URL を作る |
 | `MAX_ARTIFACT_BYTES` | PUT を受け付ける最大バイト数（既定 104857600 = 100 MB） |
 
 `.dev.vars.example` はダミー値のみ。実値を Git に入れない。
@@ -95,7 +98,7 @@ pnpm db:migrate:remote  # 本番（Cloudflare の認証情報が必要）
 
 ```sh
 # ローカル（pnpm dev 中）
-TURBO_API=http://localhost:3000 \
+TURBO_API=https://turbo-cache.localhost \
 TURBO_TOKEN=trc_xxx \
 TURBO_TEAM=acme/web \
 pnpm turbo run build
@@ -143,7 +146,7 @@ npx wrangler r2 bucket create turbo-remote-cache
 npx wrangler secret put BETTER_AUTH_SECRET -c apps/api/wrangler.jsonc
 # GitHub Secrets: CLOUDFLARE_DATABASE_ID / CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID
 # GitHub Variables: PRODUCTION_WEB_ORIGIN（例 https://admin.example.com）
-# deploy ワークフローが wrangler.jsonc の database_id と URL を本番値に置き換える
+# deploy ワークフローが wrangler.jsonc の database_id と WEB_ORIGIN を本番値に置き換える
 pnpm db:migrate:remote
 pnpm deploy:api
 pnpm deploy:web
@@ -157,7 +160,8 @@ pnpm deploy:web
 
 | コマンド | 内容 |
 | --- | --- |
-| `pnpm dev` | Web + API を同時起動 |
+| `pnpm dev` | Web（portless）+ API を同時起動 |
+| `PORTLESS=0 pnpm dev` | portless を迂回し、Web を port 3000 で起動 |
 | `pnpm build` | Web のビルド |
 | `pnpm test` | Vitest（pure / Workers 統合） |
 | `pnpm typecheck` | tsrs |

@@ -26,9 +26,9 @@ const metadataSchema = v.union([
   v.pipe(v.string(), v.parseJson(), metadataObjectSchema),
 ]);
 
-export const createRpcHandler = (env: AppEnv) => {
+export const createRpcHandler = (env: AppEnv, origin: string) => {
   const db = createDb(env.DB);
-  const auth = createAuth(env);
+  const auth = createAuth(env, origin);
   const os = implement(adminContract).$context<AdminContext>();
 
   const requireAdmin = async (headers: Headers) => {
@@ -46,7 +46,7 @@ export const createRpcHandler = (env: AppEnv) => {
   };
 
   const assertSameOrigin = (headers: Headers) => {
-    if (headers.get("origin") !== env.WEB_ORIGIN) {
+    if (headers.get("origin") !== origin) {
       throw new ORPCError("FORBIDDEN", { message: "Origin が一致しない" });
     }
   };

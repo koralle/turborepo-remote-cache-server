@@ -20,19 +20,22 @@ const hostnameOf = (origin: string): string => {
   try {
     return new URL(origin).hostname;
   } catch (error) {
-    throw new Error(`WEB_ORIGIN が URL ではない: ${origin}`, { cause: error });
+    throw new Error(`Web のオリジンが URL ではない: ${origin}`, {
+      cause: error,
+    });
   }
 };
 
-export const createAuth = (env: AppEnv) => {
+// origin はブラウザから見た Web のオリジン。
+// 本番は WEB_ORIGIN に固定し、ローカルは portless の URL をリクエストから都度求める。
+export const createAuth = (env: AppEnv, origin: string) => {
   const db = createDb(env.DB);
-  const webOrigin = env.WEB_ORIGIN;
 
   return betterAuth({
-    baseURL: env.BETTER_AUTH_URL,
+    baseURL: origin,
     basePath: "/api/auth",
     secret: env.BETTER_AUTH_SECRET,
-    trustedOrigins: [webOrigin],
+    trustedOrigins: [origin],
     emailAndPassword: { enabled: false },
     user: {
       additionalFields: {
@@ -62,9 +65,9 @@ export const createAuth = (env: AppEnv) => {
         keyExpiration: { defaultExpiresIn: 90 * 24 * 60 * 60 * 1000 },
       }),
       passkey({
-        rpID: hostnameOf(webOrigin),
+        rpID: hostnameOf(origin),
         rpName: "Turborepo Remote Cache",
-        origin: webOrigin,
+        origin,
         registration: {
           requireSession: false,
           resolveUser: async ({ context }) => {

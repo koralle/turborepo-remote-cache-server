@@ -5,7 +5,11 @@ import { env } from "cloudflare:test";
 import { createAuth } from "../src/auth.ts";
 
 export const db = createDb(env.DB);
-const auth = createAuth(env);
+
+// Hono の app.request(path) は http://localhost で受ける。
+export const testOrigin = "http://localhost";
+
+const auth = createAuth(env, testOrigin);
 
 export const seedUser = async (): Promise<string> => {
   const id = crypto.randomUUID();
