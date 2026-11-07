@@ -1,0 +1,9 @@
+.pi/
+dist/
+coverage/
+.storybook-out/
+storybook-static/
+styled-system/
+worker-configuration.d.ts
+*.gen.ts
+pnpm-lock.yaml

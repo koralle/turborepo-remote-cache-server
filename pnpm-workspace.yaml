@@ -1,0 +1,70 @@
+packages:
+  - apps/*
+  - packages/*
+
+catalogMode: strict
+saveExact: true
+engineStrict: true
+catalogs:
+  tooling:
+    "@tsconfig/strictest": 2.0.8
+    "@types/node": 24.10.1
+    knip: 6.44.2
+    lefthook: 2.2.2
+    oxfmt: 0.77.0
+    oxlint: 1.92.0
+    tsrs: 0.23.0-ts7.1.0-beta
+    typescript: 7.0.2
+    ultracite: 8.1.1
+minimumReleaseAgeExclude:
+  - "@oxfmt/binding-android-arm-eabi@0.77.0"
+  - "@oxfmt/binding-android-arm64@0.77.0"
+  - "@oxfmt/binding-darwin-arm64@0.77.0"
+  - "@oxfmt/binding-darwin-x64@0.77.0"
+  - "@oxfmt/binding-freebsd-x64@0.77.0"
+  - "@oxfmt/binding-linux-arm-gnueabihf@0.77.0"
+  - "@oxfmt/binding-linux-arm-musleabihf@0.77.0"
+  - "@oxfmt/binding-linux-arm64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-arm64-musl@0.77.0"
+  - "@oxfmt/binding-linux-ppc64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-riscv64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-riscv64-musl@0.77.0"
+  - "@oxfmt/binding-linux-s390x-gnu@0.77.0"
+  - "@oxfmt/binding-linux-x64-gnu@0.77.0"
+  - "@oxfmt/binding-linux-x64-musl@0.77.0"
+  - "@oxfmt/binding-openharmony-arm64@0.77.0"
+  - "@oxfmt/binding-win32-arm64-msvc@0.77.0"
+  - "@oxfmt/binding-win32-ia32-msvc@0.77.0"
+  - "@oxfmt/binding-win32-x64-msvc@0.77.0"
+  - "@oxlint/binding-android-arm-eabi@1.92.0"
+  - "@oxlint/binding-android-arm64@1.92.0"
+  - "@oxlint/binding-darwin-arm64@1.92.0"
+  - "@oxlint/binding-darwin-x64@1.92.0"
+  - "@oxlint/binding-freebsd-x64@1.92.0"
+  - "@oxlint/binding-linux-arm-gnueabihf@1.92.0"
+  - "@oxlint/binding-linux-arm-musleabihf@1.92.0"
+  - "@oxlint/binding-linux-arm64-gnu@1.92.0"
+  - "@oxlint/binding-linux-arm64-musl@1.92.0"
+  - "@oxlint/binding-linux-ppc64-gnu@1.92.0"
+  - "@oxlint/binding-linux-riscv64-gnu@1.92.0"
+  - "@oxlint/binding-linux-riscv64-musl@1.92.0"
+  - "@oxlint/binding-linux-s390x-gnu@1.92.0"
+  - "@oxlint/binding-linux-x64-gnu@1.92.0"
+  - "@oxlint/binding-linux-x64-musl@1.92.0"
+  - "@oxlint/binding-openharmony-arm64@1.92.0"
+  - "@oxlint/binding-win32-arm64-msvc@1.92.0"
+  - "@oxlint/binding-win32-ia32-msvc@1.92.0"
+  - "@oxlint/binding-win32-x64-msvc@1.92.0"
+  - "@tsrs/darwin-arm64@0.23.0-ts7.1.0-beta"
+  - "@tsrs/darwin-x64@0.23.0-ts7.1.0-beta"
+  - "@tsrs/linux-arm64-gnu@0.23.0-ts7.1.0-beta"
+  - "@tsrs/linux-arm64-musl@0.23.0-ts7.1.0-beta"
+  - "@tsrs/linux-x64-gnu@0.23.0-ts7.1.0-beta"
+  - "@tsrs/linux-x64-musl@0.23.0-ts7.1.0-beta"
+  - "@tsrs/win32-x64@0.23.0-ts7.1.0-beta"
+  - knip@6.44.2
+  - oxfmt@0.77.0
+  - oxlint@1.92.0
+  - tsrs@0.23.0-ts7.1.0-beta
+allowBuilds:
+  lefthook: true
