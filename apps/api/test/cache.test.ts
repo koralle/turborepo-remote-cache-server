@@ -408,3 +408,33 @@ describe("仕様とのルーティング対応", () => {
     expect(batch.status).toBe(200);
   });
 });
+
+describe("申告値と実際のサイズ", () => {
+  it("Content-Length より大きい本文は保存されない", async () => {
+    const { key } = await setup();
+
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        // MAX_ARTIFACT_BYTES はテスト環境で 16。申告は 1 バイトで 32 バイト送る。
+        controller.enqueue(new Uint8Array(32));
+        controller.close();
+      },
+    });
+
+    const response = await call(`/v8/artifacts/${hashA}`, {
+      body: stream,
+      headers: { authorization: `Bearer ${key}`, "content-length": "1" },
+      method: "PUT",
+    });
+
+    // 自分で 413 にするか、実行環境が本文を拒否して 5xx になる。どちらでも保存はしない。
+    expect(response.ok).toBeFalsy();
+
+    const head = await call(`/v8/artifacts/${hashA}`, {
+      headers: { authorization: `Bearer ${key}` },
+      method: "HEAD",
+    });
+
+    expect(head.status).toBe(404);
+  });
+});

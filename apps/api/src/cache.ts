@@ -1,4 +1,5 @@
 import { vArtifactQueryRequest, vCacheEvents } from "@repo/api-contract";
+import type { CachingStatusResponse } from "@repo/api-contract";
 import { createDb, repositories } from "@repo/db";
 import {
   artifactStorageKey,
@@ -217,14 +218,22 @@ export const createCacheRoutes = () => {
   });
 
   cache.get("/artifacts/status", (c) =>
-    c.json({ status: "enabled" }, 200, corsHeaders)
+    c.json(
+      { status: "enabled" } satisfies CachingStatusResponse,
+      200,
+      corsHeaders
+    )
   );
 
   cache.on("HEAD", "/artifacts/:hash", async (c) => {
     const parsedHash = toArtifactHash(c.req.param("hash"));
 
     if (parsedHash === null) {
-      return c.body(null, 400, corsHeaders);
+      return c.json(
+        errorBody("bad_request", "ハッシュが不正"),
+        400,
+        corsHeaders
+      );
     }
 
     const object = await c.env.BUCKET.head(

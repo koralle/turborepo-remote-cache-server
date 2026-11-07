@@ -76,7 +76,6 @@ export const createRpcHandler = (env: AppEnv, origin: string) => {
 
         const result = await auth.api.listApiKeys({
           headers: context.headers,
-          query: { limit: 100 },
         });
 
         const rows = await db.select().from(repositories);

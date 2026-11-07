@@ -107,3 +107,31 @@ describe("成果物メタデータの読み取り", () => {
     });
   });
 });
+
+describe("入力の上限", () => {
+  it("64 文字を超えるハッシュを拒否する", () => {
+    expect(toArtifactHash("a".repeat(64))).toBe("a".repeat(64));
+    expect(toArtifactHash("a".repeat(65))).toBeNull();
+  });
+
+  it("長すぎる sha と dirty-hash を拒否する", () => {
+    const headers = new Headers({
+      "x-artifact-dirty-hash": "a".repeat(201),
+    });
+
+    expect(parseArtifactMetadata(headers)).toStrictEqual({
+      error:
+        "x-artifact-sha / x-artifact-dirty-hash must be at most 200 characters",
+      ok: false,
+    });
+  });
+
+  it("整数にならない桁数の duration を拒否する", () => {
+    const headers = new Headers({ "x-artifact-duration": "9".repeat(400) });
+
+    expect(parseArtifactMetadata(headers)).toStrictEqual({
+      error: "x-artifact-duration must be a non-negative integer",
+      ok: false,
+    });
+  });
+});

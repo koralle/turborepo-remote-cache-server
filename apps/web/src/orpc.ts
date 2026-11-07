@@ -3,12 +3,17 @@ import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import type { adminContract } from "@repo/api-contract";
 
-const baseURL =
-  typeof window === "undefined"
-    ? "http://localhost:3000"
-    : window.location.origin;
+// 管理 API は Web の同一オリジン経由でのみ呼ぶ。SSR から呼ぶ作りにしたら
+// リクエストのオリジンを渡すこと（ここでは未対応）。
+const link = new RPCLink({
+  url: () => {
+    if (typeof window === "undefined") {
+      throw new TypeError("SSR からは管理 API を呼ばない");
+    }
 
-const link = new RPCLink({ url: `${baseURL}/rpc` });
+    return `${window.location.origin}/rpc`;
+  },
+});
 
 export const adminClient: ContractRouterClient<typeof adminContract> =
   createORPCClient(link);

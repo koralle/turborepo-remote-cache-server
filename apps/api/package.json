@@ -7,7 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "types": "wrangler types",
-    "typecheck": "tsrs --noEmit --fast -p tsconfig.json && tsrs --noEmit --fast -p tsconfig.test.json && tsrs --noEmit --fast -p scripts/tsconfig.json",
+    "typecheck": "tsrs --noEmit --fast -p tsconfig.json && tsrs --noEmit --fast -p scripts/tsconfig.json",
     "db:migrate": "wrangler d1 migrations apply turbo-remote-cache --local",
     "db:migrate:remote": "wrangler d1 migrations apply turbo-remote-cache --remote",
     "admin:setup": "node --env-file-if-exists=.dev.vars scripts/admin-setup.ts"

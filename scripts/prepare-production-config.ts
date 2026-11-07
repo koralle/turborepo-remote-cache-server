@@ -12,12 +12,27 @@ if (origin === undefined || !origin.startsWith("https://")) {
 }
 
 const rewrite = async (file: string): Promise<void> => {
-  let config = await readFile(file, "utf-8");
-  config = config.replaceAll(
-    '"database_id": "00000000-0000-0000-0000-000000000000"',
-    `"database_id": "${databaseId}"`
-  );
-  config = config.replaceAll('"WEB_ORIGIN": ""', `"WEB_ORIGIN": "${origin}"`);
+  const original = await readFile(file, "utf-8");
+
+  const replacements: [from: string, to: string][] = [
+    [
+      '"database_id": "00000000-0000-0000-0000-000000000000"',
+      `"database_id": "${databaseId}"`,
+    ],
+    ['"WEB_ORIGIN": ""', `"WEB_ORIGIN": "${origin}"`],
+  ];
+
+  let config = original;
+
+  // 置換対象が消えたまま本番へ出るのを防ぐ。
+  for (const [from, to] of replacements) {
+    if (!config.includes(from)) {
+      throw new Error(`${file} に置換対象が無い: ${from}`);
+    }
+
+    config = config.replaceAll(from, to);
+  }
+
   await writeFile(file, config);
 };
 

@@ -11,6 +11,7 @@ export const originOf = (env: AppEnv, request: Request): string => {
     return env.WEB_ORIGIN;
   }
 
+  // request.url は必ず絶対 URL だが、リポジトリの lint 規約で catch を要求される。
   try {
     return new URL(request.url).origin;
   } catch (error) {

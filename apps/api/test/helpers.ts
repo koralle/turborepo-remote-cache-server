@@ -1,3 +1,5 @@
+// tsconfig の types 条件だけでは node10 解決の TS サーバー（lens）が引けないため、実ファイルを読み込む。
+import "../node_modules/@cloudflare/vitest-plugin/types/cloudflare-test.d.ts";
 /* oxlint-disable typescript/no-deprecated -- テスト用の env は cloudflare:test から取得する */
 import { createDb, repositories, user } from "@repo/db";
 import { env } from "cloudflare:test";

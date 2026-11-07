@@ -1,15 +1,12 @@
 import type { ReadonlyDeep, Tagged } from "type-fest";
 
-export const CACHE_READ = "cache:read";
-export const CACHE_WRITE = "cache:write";
-
 export type CacheScope = "read" | "read-write";
 
 export type RepositoryId = Tagged<string, "RepositoryId">;
 
 export type ArtifactHash = Tagged<string, "ArtifactHash">;
 
-const hashPattern = /^[a-fA-F0-9]+$/u;
+const hashPattern = /^[a-fA-F0-9]{1,64}$/u;
 
 // 検証を通った値だけをブランド型にする。実行時の検証はここで行う。
 const isArtifactHash = (value: string): value is ArtifactHash =>
@@ -60,6 +57,11 @@ export type ParsedArtifactMetadata =
   | { ok: true; value: ReadonlyDeep<ArtifactMetadata> }
   | { ok: false; error: string };
 
+const maxMetadataLength = 200;
+
+const isShortMetadata = (value: string | undefined): boolean =>
+  value === undefined || value.length <= maxMetadataLength;
+
 export const parseArtifactMetadata = (
   headers: Headers
 ): ParsedArtifactMetadata => {
@@ -73,19 +75,30 @@ export const parseArtifactMetadata = (
   }
 
   const duration = headers.get("x-artifact-duration") ?? undefined;
+  const sha = headers.get("x-artifact-sha") ?? undefined;
+  const dirtyHash = headers.get("x-artifact-dirty-hash") ?? undefined;
+
+  // R2 のメタデータ上限を超える値は保存時に 500 になるため、ここで弾く。
+  if (!isShortMetadata(sha) || !isShortMetadata(dirtyHash)) {
+    return {
+      ok: false,
+      error: `x-artifact-sha / x-artifact-dirty-hash must be at most ${maxMetadataLength} characters`,
+    };
+  }
 
   const metadata: ArtifactMetadata = {
     tag,
     durationMs: undefined,
-    sha: headers.get("x-artifact-sha") ?? undefined,
-    dirtyHash: headers.get("x-artifact-dirty-hash") ?? undefined,
+    sha,
+    dirtyHash,
   };
 
   if (duration === undefined) {
     return { ok: true, value: metadata };
   }
 
-  if (!/^\d+$/u.test(duration)) {
+  // 桁だけでは Infinity になる値を弾けないため、安全な整数かまで見る。
+  if (!/^\d+$/u.test(duration) || !Number.isSafeInteger(Number(duration))) {
     return {
       ok: false,
       error: "x-artifact-duration must be a non-negative integer",

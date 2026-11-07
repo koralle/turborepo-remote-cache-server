@@ -2,6 +2,7 @@ import type { KeySummary } from "@repo/api-contract";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Button } from "react-aria-components";
 
 import { css } from "../../styled-system/css";
 import { authClient } from "../auth-client";
@@ -49,6 +50,11 @@ const KeysRoute = () => {
     },
   });
 
+  const signOut = async (): Promise<void> => {
+    await authClient.signOut();
+    await navigate({ to: "/" });
+  };
+
   if (session === null) {
     return null;
   }
@@ -66,6 +72,20 @@ const KeysRoute = () => {
       <h1 className={css({ fontSize: "1.5rem", marginBottom: "1.5rem" })}>
         API キー
       </h1>
+
+      <Button
+        className={css({
+          color: "gray.700",
+          marginBottom: "1.5rem",
+          textDecoration: "underline",
+        })}
+        onPress={() => {
+          // oxlint-disable-next-line typescript/no-floating-promises
+          signOut();
+        }}
+      >
+        サインアウト
+      </Button>
 
       {issued === null ? null : (
         <section
