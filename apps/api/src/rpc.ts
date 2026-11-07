@@ -74,11 +74,11 @@ export const createRpcHandler = (env: AppEnv, origin: string) => {
       list: os.keys.list.handler(async ({ context }) => {
         await requireAdmin(context.headers);
 
-        const result = await auth.api.listApiKeys({
-          headers: context.headers,
-        });
+        const [result, rows] = await Promise.all([
+          auth.api.listApiKeys({ headers: context.headers }),
+          db.select().from(repositories),
+        ]);
 
-        const rows = await db.select().from(repositories);
         const byId = new Map(rows.map((row) => [row.id, row]));
 
         const keys = result.apiKeys.map((key) => {

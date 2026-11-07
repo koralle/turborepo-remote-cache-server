@@ -22,7 +22,18 @@ export default defineConfig({
     ...RECOMMENDED_RULES,
     ...TANSTACK_START_RULES,
     ...TANSTACK_QUERY_RULES,
+    // スタンドアロンでは memo() 判定ができず誤検知する（実体は
+    // react-doctor/no-inline-prop-on-memo-component が担う）。
+    "react-doctor/jsx-no-new-function-as-prop": "off",
+    "react-doctor/jsx-no-new-array-as-prop": "off",
   },
+  overrides: [
+    {
+      // TanStack Router のルートファイルは Route だけを export する規約。
+      files: ["apps/web/src/routes/**"],
+      rules: { "react-doctor/only-export-components": "off" },
+    },
+  ],
   ignorePatterns: [
     ...(core.ignorePatterns ?? []),
     "**/*.gen.ts",
