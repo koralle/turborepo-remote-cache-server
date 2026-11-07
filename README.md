@@ -132,9 +132,9 @@ npx wrangler r2 bucket lifecycle add turbo-remote-cache \
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml`: lint / format / typecheck / knip、Panda codegen 再生成の差分（`apps/web/styled-system.sha256`）、マイグレーション変更禁止、test、build、Storybook build、実 Turborepo E2E。`permissions: contents: read`、PR にシークレットを渡さない。
-- `.github/workflows/deploy.yml`: 手動実行 + environment 承認。`concurrency` で直列化し、migration → API → Web の順に実行。失敗すると後続は実行されない。main push の自動本番デプロイは無い。
-- `.github/workflows/react-doctor.yml`: `doctor.config.ts` の厳しめ設定（全カテゴリ error / `blocking: warning`）で PR の新規指摘と main のスコア推移を出す。
+- `.github/workflows/ci.yaml`: lint / format / typecheck / knip、Panda codegen 再生成の差分（`apps/web/styled-system.sha256`）、マイグレーション変更禁止、test、build、Storybook build、実 Turborepo E2E。`permissions: contents: read`、PR にシークレットを渡さない。
+- `.github/workflows/deploy.yaml`: 手動実行 + environment 承認。`concurrency` で直列化し、migration → API → Web の順に実行。失敗すると後続は実行されない。main push の自動本番デプロイは無い。
+- `.github/workflows/react-doctor.yaml`: `doctor.config.ts` の厳しめ設定（全カテゴリ error / `blocking: warning`）で PR の新規指摘と main のスコア推移を出す。
 
 CI では `pnpm install --frozen-lockfile` を使う。
 
