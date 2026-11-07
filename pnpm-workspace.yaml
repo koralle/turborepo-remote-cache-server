@@ -8,8 +8,6 @@ engineStrict: true
 catalogs:
   api:
     valibot: 1.5.0
-  codegen:
-    "@hey-api/openapi-ts": 0.99.0
   tooling:
     "@tsconfig/strictest": 2.0.8
     "@types/node": 24.10.1
@@ -18,7 +16,7 @@ catalogs:
     oxfmt: 0.77.0
     oxlint: 1.92.0
     tsrs: 0.23.0-ts7.1.0-beta
-    typescript: 5.9.3
+    typescript: 7.0.2
     ultracite: 8.1.1
 minimumReleaseAgeExclude:
   - "@oxfmt/binding-android-arm-eabi@0.77.0"

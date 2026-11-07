@@ -6,6 +6,5 @@
       "entry": [],
       "project": []
     }
-  },
-  "ignore": ["packages/api-contract/src/turborepo/**"]
+  }
 }

@@ -97,10 +97,12 @@
 
 ## 5. コード生成・型
 
-- Hey API 0.99.0。Valibot 出力は `@hey-api/openapi-ts` 内蔵プラグイン（`plugins: ['valibot']`）。`@hey-api/valibot` というパッケージは存在しない（npm 404）。
+- Hey API 0.99.0 は不採用（ユーザー指示）。同種の OpenAPI コード生成も使わない。
+- 不採用の理由の一つ: Hey API は TypeScript の JS コンパイラ API を要求し、TypeScript 7 では動作しない（`ts.SyntaxKind` が undefined）。TypeScript 7 を優先するため、契約は仕様から手書きする。
 - 生成物は `valibot.gen.ts` 等。型は `@hey-api/typescript` プラグインが生成する。Valibot スキーマから `v.InferOutput` で型を導出できる。
 - type-fest 5.10.0。readme に「TypeScript >= 5.9、ESM、`strict: true` が必要」。`Tagged`、`ReadonlyDeep`、`OverrideProperties`、`Merge`、`Simplify` を利用候補とする。
 - TypeScript は 7.0.2（npm latest）。tsrs は `0.23.0-ts7.1.0-beta` で、TypeScript 7.1 beta の Rust 実装。`tsrs --noEmit --fast` で型検査。
+- 7.0.2 は `tsc` が動く。JS コンパイラ API に依存するツール（コード生成など）は使わない方針にした。
 
 ## 6. その他のバージョン（npm 確認）
 
@@ -127,7 +129,7 @@
 ## 7. 実装中に検証するリスク
 
 1. TypeScript 7.0.2 と tsrs（7.1 beta 固定）の診断差。差が出た場合は tsrs の該当箇所を記録し、`tsc` との二重確認で切り分ける。
-2. Hey API が OpenAPI 3.0.3 の `nullable` + `oneOf` + `additionalProperties`（`ArtifactQueryResponse`）をどう生成するか。生成結果を確認し、足りない検証は手書きで補う。
+2. 仕様の `additionalProperties` + `oneOf` + `nullable`（一括照会の応答）を手書きの Valibot スキーマで正しく表せるか。テストで確認する。
 3. Storybook 10.6 と Vite 8、TanStack Start 1.169 と `@cloudflare/vite-plugin` 1.67 の組み合わせ。
 4. Better Auth の D1 アダプタ経路（`provider: "sqlite"`）と、検証ごとの書き込みが D1 の単一スレッド性能に与える影響。
 5. pnpm 12 の `catalogMode` / `saveExact` / `engineStrict` / ビルドスクリプト許可の設定キー。

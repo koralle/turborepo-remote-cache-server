@@ -8,7 +8,8 @@
 2. Turborepo CLI の公開経路は **API Worker を直接 HTTPS 公開**（`TURBO_API`）。Web はブラウザ向けの認証・管理 API だけを同一オリジンで受けて Service Binding 転送する。
 3. 管理者ログインは **メール + パスワード**。公開サインアップは無効。最初の管理者と復旧は **CLI スクリプト（秘密は標準入力か環境変数）**。
 4. API キー 1 本 = 1 リポジトリ。権限は `cache:read` と `cache:read + cache:write` の 2 種。
-5. `teamId` / `slug` は「キーに紐付くリポジトリの別名」との一致確認だけに使い、R2 の保存先には使わない。
+5. コード生成ツール（Hey API など）は使わない。仕様は vendoring し、TypeScript の型と Valibot スキーマは仕様から手書きする。TypeScript は 7 系。
+6. `teamId` / `slug` は「キーに紐付くリポジトリの別名」との一致確認だけに使い、R2 の保存先には使わない。
 
 ## 2. 全体構成
 
@@ -43,7 +44,7 @@ apps/
   api/     Hono。Better Auth、oRPC、キャッシュ API。bindings: DB, BUCKET
   web/     TanStack Start。管理画面、同一オリジン転送。binding: API
 packages/
-  api-contract/  oRPC 契約（管理 API）、Turborepo OpenAPI 生成物、Valibot スキーマ
+  api-contract/  oRPC 契約（管理 API）、Turborepo 仕様から手書きした型と Valibot スキーマ、仕様の保管
   db/            Drizzle schema、接続、マイグレーション、admin CLI
   domain/        純粋ロジック（R2 キー、権限判定、ヘッダー検証、team/slug 照合）
   forge/         共有 tsconfig / oxlint / oxfmt / knip 設定
@@ -178,7 +179,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 | `check` | codegen → oxlint → oxfmt --check → typecheck → knip |
 | `fix` | oxlint --fix → oxfmt |
 | `knip` | knip |
-| `generate` | OpenAPI 取得・Hey API・Panda codegen |
+| `generate` | Panda codegen（仕様の再取得は `spec:update`） |
 | `deploy` | API → Web（承認後に使う想定） |
 | `deploy:api` / `deploy:web` | 個別 |
 | `db:generate` / `db:migrate` | Drizzle Kit / wrangler d1 |
@@ -223,6 +224,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 - パスキーは導入しない（後から追加可能な設計にする）。
 - 保持期間は R2 ライフサイクルに依存し、アプリからの削除 API は作らない。
 - 本番 Cloudflare リソースの作成とデプロイは、承認後に別途行う。
+- OpenAPI のコード生成は行わない。仕様（`packages/api-contract/spec/`）を出典として、型と Valibot スキーマを手書きで維持する。
 
 ## 14. 合意してほしい点
 

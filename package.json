@@ -4,11 +4,10 @@
   "type": "module",
   "scripts": {
     "typecheck": "pnpm -r --if-present run typecheck",
-    "check": "pnpm run generate && pnpm run typecheck && oxlint --type-aware && oxfmt -c oxfmt.config.ts --check && knip",
+    "check": "pnpm run typecheck && oxlint --type-aware && oxfmt -c oxfmt.config.ts --check && knip",
     "fix": "oxlint --type-aware --fix && oxfmt -c oxfmt.config.ts",
     "knip": "knip",
-    "prepare": "lefthook install",
-    "generate": "pnpm -r --if-present run generate"
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "@types/node": "catalog:tooling",
