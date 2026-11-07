@@ -13,6 +13,7 @@
 | `TURBO_API=http://localhost:3000` で `GET /v8/artifacts/status` | 200 |
 | 同 `PUT /v8/artifacts/{hash}` | 202 |
 | 同 `GET /v8/artifacts/{hash}` | 200 |
+| `./e2e/dev-smoke.sh`（上記を自動化） | 成功（passkey options 200 / status 200 / PUT 202 / GET 200） |
 
 Web の server entry が `/v8` と `/artifacts` を Service Binding で API に転送するため、ローカル CLI は port 3000 で接続できる。
 

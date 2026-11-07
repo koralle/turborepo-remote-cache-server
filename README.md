@@ -168,6 +168,7 @@ pnpm deploy:web
 | `pnpm spec:update` | Turborepo OpenAPI の再取得 |
 | `pnpm storybook` / `pnpm storybook:build` | Storybook |
 | `pnpm e2e` | 実 Turborepo の E2E |
+| `./e2e/dev-smoke.sh` | `pnpm dev` の D1 migrate と `/v8` 転送を確認（dev 起動中は不可） |
 | `pnpm admin:setup` | 管理者パスキーの初期登録・復旧 |
 | `pnpm deploy` / `deploy:api` / `deploy:web` | デプロイ |
 
