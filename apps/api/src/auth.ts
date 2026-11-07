@@ -96,6 +96,9 @@ export const createAuth = (env: AppEnv, origin: string) => {
     basePath: "/api/auth",
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [origin],
+    // アダプタの findMany は既定で 100 件に切られる。ここを上げないと、
+    // 101 件目以降の API キーが一覧に出ず失効できなくなる。
+    advanced: { database: { defaultFindManyLimit: 1000 } },
     emailAndPassword: { enabled: false },
     user: {
       additionalFields: {

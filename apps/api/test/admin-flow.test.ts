@@ -5,7 +5,14 @@ import { eq } from "drizzle-orm";
 import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 
-import { call, db, seedUser, testOrigin as origin } from "./helpers.ts";
+import {
+  call,
+  db,
+  issueKey,
+  seedRepository,
+  seedUser,
+  testOrigin as origin,
+} from "./helpers.ts";
 
 // Better Auth はセッション Cookie を HMAC で署名する。内部形式に合わせてテストで再現する。
 const signCookie = async (value: string): Promise<string> => {
@@ -127,6 +134,40 @@ describe("管理 API の一連の操作", () => {
     expect(parsed.output.json.keys.map((key) => key.repositorySlug)).toContain(
       slug
     );
+  });
+
+  it("100 件を超えるキーも一覧に出る", async () => {
+    const userId = await seedUser();
+    const cookie = await loginCookie(userId);
+
+    const repositoryId = await seedRepository(
+      `acme/web-${crypto.randomUUID()}`
+    );
+
+    await Promise.all(
+      Array.from(
+        { length: 101 },
+        async () => await issueKey({ repositoryId, scope: "read", userId })
+      )
+    );
+
+    const listed = await rpc("/rpc/keys/list", cookie, {});
+    const payload: unknown = await listed.json();
+
+    const parsed = v.safeParse(
+      v.object({
+        json: v.object({ keys: v.array(v.object({ id: v.string() })) }),
+      }),
+      payload
+    );
+
+    expect(parsed.success).toBeTruthy();
+
+    if (!parsed.success) {
+      throw new Error(`キー一覧の応答が不正: ${JSON.stringify(payload)}`);
+    }
+
+    expect(parsed.output.json.keys).toHaveLength(101);
   });
 
   it("失効するとキャッシュ API で使えなくなる", async () => {

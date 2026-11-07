@@ -17,6 +17,7 @@ const KeysRoute = () => {
   const { data: session, isPending } = authClient.useSession();
   const [issued, setIssued] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isPending && session === null) {
@@ -51,7 +52,15 @@ const KeysRoute = () => {
   });
 
   const signOut = async (): Promise<void> => {
-    await authClient.signOut();
+    const { error: cause } = await authClient.signOut();
+
+    // better-auth は HTTP エラーでも throw しない。失敗時は画面を移らず、その場で知らせる。
+    if (cause !== null) {
+      setSignOutError("サインアウトできませんでした。もう一度試してください。");
+
+      return;
+    }
+
     await navigate({ to: "/" });
   };
 
@@ -86,6 +95,12 @@ const KeysRoute = () => {
       >
         サインアウト
       </Button>
+
+      {signOutError === null ? null : (
+        <p className={css({ color: "red.600" })} role="alert">
+          {signOutError}
+        </p>
+      )}
 
       {issued === null ? null : (
         <section
