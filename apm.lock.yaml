@@ -5,6 +5,7 @@ dependencies:
     name: agent-skills
     host: github.com
     resolved_commit: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
+    resolved_ref: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
     version: unknown
     package_type: skill_bundle
     deployed_files:
