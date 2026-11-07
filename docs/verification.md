@@ -44,6 +44,7 @@ Chrome DevTools Protocol の `WebAuthn.addVirtualAuthenticator`（ctap2 / intern
 | `pnpm spec:update` | 成功（sha256 `d6ec728d…` を再記録） |
 | `wrangler deploy --dry-run`（API） | 成功（D1 / R2 / vars の binding を解決） |
 | `wrangler deploy --dry-run`（Web） | 成功（API の Service Binding / vars を解決） |
+| GitHub Actions（PR #1） | `verify` 59 秒 / `e2e` 22 秒で成功 |
 
 ## 未検証
 
