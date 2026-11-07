@@ -15,6 +15,13 @@
       "when": 1794049355254,
       "tag": "0001_ancient_forge",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794051409540,
+      "tag": "0002_hard_mentor",
+      "breakpoints": true
     }
   ]
 }

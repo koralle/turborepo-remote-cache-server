@@ -17,13 +17,14 @@
     "test": "vitest run",
     "dev": "pnpm --filter @repo/web run dev",
     "build": "pnpm -r --if-present run build",
-    "generate": "pnpm --filter @repo/web exec panda codegen",
+    "generate": "pnpm -r --if-present run generate",
     "deploy": "pnpm run deploy:api && pnpm run deploy:web",
     "deploy:api": "pnpm --filter @repo/api run deploy",
     "deploy:web": "pnpm --filter @repo/web run deploy",
     "storybook": "pnpm --filter @repo/web run storybook",
     "storybook:build": "pnpm --filter @repo/web run storybook:build",
-    "e2e": "./e2e/run.sh"
+    "e2e": "./e2e/run.sh",
+    "spec:update": "pnpm --filter @repo/api-contract run spec:update"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "catalog:cloudflare",

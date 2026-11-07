@@ -6,4 +6,4 @@
 - sha256: d6ec728da4f41b9f96cb6df6ea81650b98851b8ebd46ac4dbd2c204495688b6b
 - 保存先: `spec/turborepo-remote-cache.openapi.json`
 
-`pnpm spec:update` で再取得する。生成物は `pnpm generate` で作る。
+`pnpm spec:update` で再取得する。型と Valibot スキーマは `src/turborepo.ts` に手書きで維持する。

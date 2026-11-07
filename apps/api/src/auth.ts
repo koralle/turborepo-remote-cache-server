@@ -34,6 +34,16 @@ export const createAuth = (env: AppEnv) => {
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [webOrigin],
     emailAndPassword: { enabled: false },
+    user: {
+      additionalFields: {
+        role: {
+          defaultValue: "admin",
+          input: false,
+          required: false,
+          type: "string",
+        },
+      },
+    },
     database: drizzleAdapter(db, {
       provider: "sqlite",
       schema: {

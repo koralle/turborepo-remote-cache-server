@@ -1,6 +1,7 @@
 /* oxlint-disable typescript/no-deprecated -- テスト用の env は cloudflare:test から取得する */
-import { session } from "@repo/db";
+import { session, user } from "@repo/db";
 import { env } from "cloudflare:test";
+import { eq } from "drizzle-orm";
 import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 
@@ -145,6 +146,16 @@ describe("管理 API の一連の操作", () => {
       },
       method: "POST",
     });
+    expect(response.status).toBe(403);
+  });
+});
+
+describe("管理者権限", () => {
+  it("管理者でないセッションではキーを発行できない", async () => {
+    const userId = await seedUser();
+    await db.update(user).set({ role: "user" }).where(eq(user.id, userId));
+    const cookie = await loginCookie(userId);
+    const response = await createKey(cookie, `acme/web-${crypto.randomUUID()}`);
     expect(response.status).toBe(403);
   });
 });

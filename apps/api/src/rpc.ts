@@ -48,6 +48,9 @@ export const createRpcHandler = (env: AppEnv) => {
     if (session === null) {
       throw new ORPCError("UNAUTHORIZED");
     }
+    if (session.user.role !== "admin") {
+      throw new ORPCError("FORBIDDEN", { message: "管理者ではない" });
+    }
     return session;
   };
 

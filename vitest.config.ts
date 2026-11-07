@@ -12,6 +12,13 @@ export default defineConfig({
         },
       },
       {
+        test: {
+          environment: "node",
+          include: ["apps/api/test-node/**/*.test.ts"],
+          name: "node",
+        },
+      },
+      {
         plugins: [
           cloudflareTest({
             miniflare: {

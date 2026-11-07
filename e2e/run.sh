@@ -5,7 +5,8 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root"
 
-api_port=8787
+# 既存プロセスとの衝突を避けるため、空いているポートを使う。
+api_port="$(node -e 'const net=require("node:net");const s=net.createServer();s.listen(0,()=>{console.log(s.address().port);s.close()})')"
 api="http://127.0.0.1:${api_port}"
 work="$(mktemp -d)"
 fixture="$work/fixture"
@@ -68,7 +69,7 @@ test -f "$fixture/dist/out.txt"
 grep -q "e2e-output-v1" "$fixture/dist/out.txt"
 
 log "3. ソース変更でミスになる"
-sed -i '' 's/e2e-output-v1/e2e-output-v2/' "$fixture/build.mjs"
+perl -pi -e 's/e2e-output-v1/e2e-output-v2/' "$fixture/build.mjs"
 rm -rf "$fixture/dist"
 out="$(run_turbo "$work/c3")"
 grep -q "cache miss" <<<"$out"

@@ -41,7 +41,7 @@ const main = async (): Promise<void> => {
 - sha256: ${createHash("sha256").update(body).digest("hex")}
 - 保存先: \`spec/turborepo-remote-cache.openapi.json\`
 
-\`pnpm spec:update\` で再取得する。生成物は \`pnpm generate\` で作る。
+\`pnpm spec:update\` で再取得する。型と Valibot スキーマは \`src/turborepo.ts\` に手書きで維持する。
 `
   );
 };

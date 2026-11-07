@@ -6,7 +6,7 @@
 
 1. DB は **Cloudflare D1**。
 2. Turborepo CLI の公開経路は **API Worker を直接 HTTPS 公開**（`TURBO_API`）。Web はブラウザ向けの認証・管理 API だけを同一オリジンで受けて Service Binding 転送する。
-3. 管理者ログインは **メール + パスワード**。公開サインアップは無効。最初の管理者と復旧は **CLI スクリプト（秘密は標準入力か環境変数）**。
+3. 管理者ログインは **パスキーのみ**。公開サインアップは無効。初期登録と復旧は CLI が署名した一時トークン + `/setup`。
 4. API キー 1 本 = 1 リポジトリ。権限は `cache:read` と `cache:read + cache:write` の 2 種。
 5. コード生成ツール（Hey API など）は使わない。仕様は vendoring し、TypeScript の型と Valibot スキーマは仕様から手書きする。TypeScript は 7 系。
 6. `teamId` / `slug` は「キーに紐付くリポジトリの別名」との一致確認だけに使い、R2 の保存先には使わない。

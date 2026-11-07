@@ -124,7 +124,7 @@ npx wrangler r2 bucket lifecycle add turbo-remote-cache \
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml`: lint / format / typecheck / knip、codegen 再生成の差分、マイグレーション変更禁止、test、build、Storybook build、実 Turborepo E2E。`permissions: contents: read`、PR にシークレットを渡さない。
+- `.github/workflows/ci.yml`: lint / format / typecheck / knip、Panda codegen 再生成の差分（`apps/web/styled-system.sha256`）、マイグレーション変更禁止、test、build、Storybook build、実 Turborepo E2E。`permissions: contents: read`、PR にシークレットを渡さない。
 - `.github/workflows/deploy.yml`: 手動実行 + environment 承認。`concurrency` で直列化し、migration → API → Web の順に実行。失敗すると後続は実行されない。main push の自動本番デプロイは無い。
 
 CI では `pnpm install --frozen-lockfile` を使う。
@@ -136,7 +136,9 @@ npx wrangler login
 npx wrangler d1 create turbo-remote-cache
 npx wrangler r2 bucket create turbo-remote-cache
 npx wrangler secret put BETTER_AUTH_SECRET -c apps/api/wrangler.jsonc
-# 本番の URL に合わせて wrangler.jsonc の vars と database_id を更新する
+# GitHub Secrets: CLOUDFLARE_DATABASE_ID / CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID
+# GitHub Variables: PRODUCTION_WEB_ORIGIN（例 https://admin.example.com）
+# deploy ワークフローが wrangler.jsonc の database_id と URL を本番値に置き換える
 pnpm db:migrate:remote
 pnpm deploy:api
 pnpm deploy:web
@@ -157,7 +159,8 @@ pnpm deploy:web
 | `pnpm check` | types / generate / typecheck / lint / format / Knip |
 | `pnpm fix` | lint 自動修正 + format |
 | `pnpm knip` | 未使用の依存・export・catalog |
-| `pnpm generate` | Panda codegen |
+| `pnpm generate` | Panda codegen と再生成ハッシュの更新 |
+| `pnpm spec:update` | Turborepo OpenAPI の再取得 |
 | `pnpm storybook` / `pnpm storybook:build` | Storybook |
 | `pnpm e2e` | 実 Turborepo の E2E |
 | `pnpm admin:setup` | 管理者パスキーの初期登録・復旧 |

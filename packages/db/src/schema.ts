@@ -10,6 +10,7 @@ export const user = sqliteTable("user", {
     .notNull()
     .default(false),
   image: text("image"),
+  role: text("role").notNull().default("admin"),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 });
