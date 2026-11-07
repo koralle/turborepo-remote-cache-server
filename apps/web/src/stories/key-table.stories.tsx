@@ -42,7 +42,7 @@ export const Default: Story = {
     onRevoke: () => {
       /* ストーリーでは何もしない */
     },
-    revoking: null,
+    revoking: [],
   },
 };
 
@@ -52,6 +52,6 @@ export const Empty: Story = {
     onRevoke: () => {
       /* ストーリーでは何もしない */
     },
-    revoking: null,
+    revoking: [],
   },
 };

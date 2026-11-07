@@ -6,7 +6,7 @@ import { css } from "../../styled-system/css";
 interface KeyTableProps {
   keys: KeySummary[];
   onRevoke: (id: string) => void;
-  revoking: string | null;
+  revoking: readonly string[];
 }
 
 const formatDate = (value: string | null): string =>
@@ -16,6 +16,8 @@ const cell = css({ borderBottom: "1px solid gray.200", padding: "0.5rem" });
 const headCell = css({ borderBottom: "1px solid gray.300", padding: "0.5rem" });
 
 export const KeyTable = ({ keys, onRevoke, revoking }: KeyTableProps) => {
+  const revokingIds = new Set(revoking);
+
   if (keys.length === 0) {
     return (
       <p className={css({ color: "gray.600" })}>API キーはまだありません。</p>
@@ -34,30 +36,34 @@ export const KeyTable = ({ keys, onRevoke, revoking }: KeyTableProps) => {
         </tr>
       </thead>
       <tbody>
-        {keys.map((key) => (
-          <tr key={key.id}>
-            <td className={cell}>{key.repositorySlug ?? "（不明）"}</td>
-            <td className={cell}>
-              {key.scope === "read" ? "読み取り専用" : "読み書き"}
-            </td>
-            <td className={cell}>{formatDate(key.expiresAt)}</td>
-            <td className={cell}>{key.enabled ? "有効" : "失効"}</td>
-            <td className={cell}>
-              <Button
-                className={css({
-                  color: "red.700",
-                  textDecoration: "underline",
-                })}
-                isDisabled={!key.enabled || revoking === key.id}
-                onPress={() => {
-                  onRevoke(key.id);
-                }}
-              >
-                失効
-              </Button>
-            </td>
-          </tr>
-        ))}
+        {keys.map((key) => {
+          const isRevoking = revokingIds.has(key.id);
+
+          return (
+            <tr key={key.id}>
+              <td className={cell}>{key.repositorySlug ?? "（不明）"}</td>
+              <td className={cell}>
+                {key.scope === "read" ? "読み取り専用" : "読み書き"}
+              </td>
+              <td className={cell}>{formatDate(key.expiresAt)}</td>
+              <td className={cell}>{key.enabled ? "有効" : "失効"}</td>
+              <td className={cell}>
+                <Button
+                  className={css({
+                    color: "red.700",
+                    textDecoration: "underline",
+                  })}
+                  isDisabled={!key.enabled || isRevoking}
+                  onPress={() => {
+                    onRevoke(key.id);
+                  }}
+                >
+                  {isRevoking ? "失効中…" : "失効"}
+                </Button>
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

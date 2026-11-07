@@ -28,7 +28,8 @@
     "better-auth": "catalog:auth",
     "react": "catalog:react",
     "react-aria-components": "catalog:ui",
-    "react-dom": "catalog:react"
+    "react-dom": "catalog:react",
+    "react-error-boundary": "catalog:react"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:cloudflare",
