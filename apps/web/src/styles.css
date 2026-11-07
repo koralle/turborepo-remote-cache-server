@@ -1,0 +1,7 @@
+@layer reset, base, tokens, recipes, utilities;
+
+html,
+body {
+  font-family: "Noto Sans JP Variable", sans-serif;
+  margin: 0;
+}

@@ -7,22 +7,44 @@ saveExact: true
 engineStrict: true
 catalogs:
   api:
+    "@orpc/client": 1.16.2
     "@orpc/contract": 1.16.2
     "@orpc/server": 1.16.2
     hono: 4.13.17
     valibot: 1.5.0
   auth:
     "@better-auth/api-key": 1.7.18
-    "@better-auth/drizzle-adapter": 1.7.18
     "@better-auth/passkey": 1.7.18
     better-auth: 1.7.18
   cloudflare:
+    "@cloudflare/vite-plugin": 1.67.0
     "@cloudflare/vitest-plugin": 1.6.0
     "@cloudflare/workers-types": 5.20261107.1
+    vite: 8.3.6
     wrangler: 4.158.0
+  react:
+    "@tanstack/react-query": 5.107.1
+    "@tanstack/react-router": 1.170.46
+    "@tanstack/react-start": 1.169.4
+    "@types/react": 19.3.0
+    "@types/react-dom": 19.3.0
+    "@vitejs/plugin-react": 6.2.1
+    react: 19.3.1
+    react-dom: 19.3.1
+  ui:
+    "@fontsource-variable/noto-sans-jp": 5.3.1
+    "@pandacss/dev": 2.5.0
+    "@pandacss/preset-base": 2.5.0
+    "@pandacss/preset-panda": 2.5.0
+    "@pandacss/vite": 2.5.0
+    "@storybook/react-vite": 10.6.6
+    react-aria-components: 1.22.1
+    storybook: 10.6.6
   db:
     drizzle-kit: 0.31.11
     drizzle-orm: 0.45.4
+  test:
+    vitest: 5.1.0
   tooling:
     "@tsconfig/strictest": 2.0.8
     "@types/node": 24.10.1
@@ -85,6 +107,10 @@ minimumReleaseAgeExclude:
   - tsrs@0.23.0-ts7.1.0-beta
   - "@cloudflare/workers-types@5.20261107.1"
   - hono@4.13.17
+  - "@tanstack/query-core@5.107.1"
+  - "@tanstack/react-query@5.107.1"
 allowBuilds:
+  "@parcel/watcher": true
   esbuild: true
   lefthook: true
+  workerd: true

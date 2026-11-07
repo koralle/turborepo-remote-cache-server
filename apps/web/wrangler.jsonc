@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turbo-remote-cache-web",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-11-07",
+  "observability": {
+    "enabled": true,
+  },
+  "services": [
+    {
+      "binding": "API",
+      "service": "turbo-remote-cache-api",
+    },
+  ],
+  "vars": {
+    "BETTER_AUTH_URL": "http://localhost:3000",
+    "WEB_ORIGIN": "http://localhost:3000",
+  },
+}

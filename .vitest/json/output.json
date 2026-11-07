@@ -1,0 +1,293 @@
+{
+  "numTotalTestSuites": 5,
+  "numPassedTestSuites": 5,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 23,
+  "numPassedTests": 23,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1794050035533,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["キャッシュ API の認証"],
+          "fullName": "キャッシュ API の認証 トークンが無ければ 401",
+          "status": "passed",
+          "title": "トークンが無ければ 401",
+          "duration": 1,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["キャッシュ API の認証"],
+          "fullName": "キャッシュ API の認証 不正なキーは 401",
+          "status": "passed",
+          "title": "不正なキーは 401",
+          "duration": 9,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["キャッシュ API の認証"],
+          "fullName": "キャッシュ API の認証 失効したキーは 401",
+          "status": "passed",
+          "title": "失効したキーは 401",
+          "duration": 14,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["キャッシュ API の認証"],
+          "fullName": "キャッシュ API の認証 期限切れのキーは 401",
+          "status": "passed",
+          "title": "期限切れのキーは 401",
+          "duration": 4,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["キャッシュ API の認証"],
+          "fullName": "キャッシュ API の認証 読み取り専用キーでは書き込めない",
+          "status": "passed",
+          "title": "読み取り専用キーでは書き込めない",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 保存すると 202 を返す",
+          "status": "passed",
+          "title": "保存すると 202 を返す",
+          "duration": 8,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 HEAD でサイズとメタデータを返す",
+          "status": "passed",
+          "title": "HEAD でサイズとメタデータを返す",
+          "duration": 6,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 GET でバイナリと署名タグをそのまま返す",
+          "status": "passed",
+          "title": "GET でバイナリと署名タグをそのまま返す",
+          "duration": 7,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 存在しない成果物は HEAD/GET とも 404",
+          "status": "passed",
+          "title": "存在しない成果物は HEAD/GET とも 404",
+          "duration": 5,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 status を返す",
+          "status": "passed",
+          "title": "status を返す",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 events を受け付ける",
+          "status": "passed",
+          "title": "events を受け付ける",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 不正な events は 400",
+          "status": "passed",
+          "title": "不正な events は 400",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["成果物の保存と復元"],
+          "fullName": "成果物の保存と復元 一括照会で保存済みと未保存を区別する",
+          "status": "passed",
+          "title": "一括照会で保存済みと未保存を区別する",
+          "duration": 6,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["リポジトリ分離と teamId / slug"],
+          "fullName": "リポジトリ分離と teamId / slug 別リポジトリからは読めない",
+          "status": "passed",
+          "title": "別リポジトリからは読めない",
+          "duration": 7,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["リポジトリ分離と teamId / slug"],
+          "fullName": "リポジトリ分離と teamId / slug 別リポジトリから同じハッシュを上書きできない",
+          "status": "passed",
+          "title": "別リポジトリから同じハッシュを上書きできない",
+          "duration": 9,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["リポジトリ分離と teamId / slug"],
+          "fullName": "リポジトリ分離と teamId / slug 一致する teamId / slug は許可する",
+          "status": "passed",
+          "title": "一致する teamId / slug は許可する",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["リポジトリ分離と teamId / slug"],
+          "fullName": "リポジトリ分離と teamId / slug slug の偽装を拒否する",
+          "status": "passed",
+          "title": "slug の偽装を拒否する",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["リポジトリ分離と teamId / slug"],
+          "fullName": "リポジトリ分離と teamId / slug teamId の偽装を拒否する",
+          "status": "passed",
+          "title": "teamId の偽装を拒否する",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["リポジトリ分離と teamId / slug"],
+          "fullName": "リポジトリ分離と teamId / slug teamId 未設定のリポジトリに teamId を指定すると拒否する",
+          "status": "passed",
+          "title": "teamId 未設定のリポジトリに teamId を指定すると拒否する",
+          "duration": 2,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["サイズと入力の境界"],
+          "fullName": "サイズと入力の境界 上限を超えると 413",
+          "status": "passed",
+          "title": "上限を超えると 413",
+          "duration": 2,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["サイズと入力の境界"],
+          "fullName": "サイズと入力の境界 不正なハッシュは 400",
+          "status": "passed",
+          "title": "不正なハッシュは 400",
+          "duration": 3,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["サイズと入力の境界"],
+          "fullName": "サイズと入力の境界 600 文字を超えるタグは 400",
+          "status": "passed",
+          "title": "600 文字を超えるタグは 400",
+          "duration": 2,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["サイズと入力の境界"],
+          "fullName": "サイズと入力の境界 Content-Length が無いアップロードを拒否する",
+          "status": "passed",
+          "title": "Content-Length が無いアップロードを拒否する",
+          "duration": 9,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794050038544,
+      "endTime": 1794050038660,
+      "status": "passed",
+      "message": "",
+      "name": "/Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/cache.test.ts"
+    }
+  ]
+}

@@ -129,9 +129,13 @@ export const apikey = sqliteTable(
   ]
 );
 
-export const repositories = sqliteTable("repositories", {
-  id: text("id").primaryKey(),
-  slug: text("slug").notNull().unique(),
-  teamId: text("team_id").unique(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-});
+export const repositories = sqliteTable(
+  "repositories",
+  {
+    id: text("id").primaryKey(),
+    slug: text("slug").notNull().unique(),
+    teamId: text("team_id"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("repositories_team_id_idx").on(table.teamId)]
+);

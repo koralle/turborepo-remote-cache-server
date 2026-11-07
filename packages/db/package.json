@@ -17,6 +17,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:cloudflare",
     "@repo/forge": "workspace:*",
+    "@tsconfig/strictest": "catalog:tooling",
     "drizzle-kit": "catalog:db"
   }
 }

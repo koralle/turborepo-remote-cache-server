@@ -1,0 +1,21 @@
+{
+  "name": "@repo/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./artifact": "./src/artifact.ts",
+    "./setup-token": "./src/setup-token.ts"
+  },
+  "scripts": {
+    "typecheck": "tsrs --noEmit --fast"
+  },
+  "dependencies": {
+    "valibot": "catalog:api"
+  },
+  "devDependencies": {
+    "@repo/forge": "workspace:*",
+    "@tsconfig/strictest": "catalog:tooling",
+    "@types/node": "catalog:tooling"
+  }
+}

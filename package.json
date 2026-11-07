@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "pnpm -r --if-present run typecheck",
-    "check": "pnpm run types && pnpm run typecheck && oxlint --type-aware && oxfmt -c oxfmt.config.ts --check && knip",
+    "typecheck": "pnpm -r --workspace-concurrency=1 --if-present run typecheck",
+    "check": "pnpm run types && pnpm run generate && pnpm run typecheck && oxlint --type-aware && oxfmt -c oxfmt.config.ts --check && knip",
     "fix": "oxlint --type-aware --fix && oxfmt -c oxfmt.config.ts",
     "knip": "knip",
     "prepare": "lefthook install",
@@ -12,9 +12,22 @@
     "db:migrate": "pnpm --filter @repo/api run db:migrate",
     "db:migrate:remote": "pnpm --filter @repo/api run db:migrate:remote",
     "types": "pnpm -r --if-present run types",
-    "check:migrations": "./scripts/check-migrations.sh HEAD"
+    "check:migrations": "./scripts/check-migrations.sh HEAD",
+    "admin:setup": "pnpm --filter @repo/api run admin:setup",
+    "test": "vitest run",
+    "dev": "pnpm --filter @repo/web run dev",
+    "build": "pnpm -r --if-present run build",
+    "generate": "pnpm --filter @repo/web exec panda codegen",
+    "deploy": "pnpm run deploy:api && pnpm run deploy:web",
+    "deploy:api": "pnpm --filter @repo/api run deploy",
+    "deploy:web": "pnpm --filter @repo/web run deploy",
+    "storybook": "pnpm --filter @repo/web run storybook",
+    "storybook:build": "pnpm --filter @repo/web run storybook:build"
   },
   "devDependencies": {
+    "@cloudflare/vitest-plugin": "catalog:cloudflare",
+    "@repo/forge": "workspace:*",
+    "@tsconfig/strictest": "catalog:tooling",
     "@types/node": "catalog:tooling",
     "knip": "catalog:tooling",
     "lefthook": "catalog:tooling",
@@ -22,7 +35,8 @@
     "oxlint": "catalog:tooling",
     "tsrs": "catalog:tooling",
     "typescript": "catalog:tooling",
-    "ultracite": "catalog:tooling"
+    "ultracite": "catalog:tooling",
+    "vitest": "catalog:test"
   },
   "engines": {
     "node": ">=24"
