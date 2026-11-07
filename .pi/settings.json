@@ -1,0 +1,6 @@
+{
+  "packages": [
+    "https://github.com/ayghri/i-have-adhd",
+    "git:github.com/DietrichGebert/ponytail"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "cloudflare": {
+      "url": "https://mcp.cloudflare.com/mcp",
+      "protocolVersion": "auto"
+    },
+    "valibot": {
+      "url": "https://valibot.dev/mcp",
+      "protocolVersion": "auto"
+    },
+    "better-auth": {
+      "url": "https://mcp.better-auth.com/mcp",
+      "protocolVersion": "auth"
+    }
+  }
+}
