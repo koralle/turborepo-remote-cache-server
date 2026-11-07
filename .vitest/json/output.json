@@ -1,11 +1,11 @@
 {
-  "numTotalTestSuites": 6,
-  "numPassedTestSuites": 6,
-  "numFailedTestSuites": 0,
+  "numTotalTestSuites": 2,
+  "numPassedTestSuites": 0,
+  "numFailedTestSuites": 2,
   "numPendingTestSuites": 0,
-  "numTotalTests": 10,
-  "numPassedTests": 10,
-  "numFailedTests": 0,
+  "numTotalTests": 4,
+  "numPassedTests": 1,
+  "numFailedTests": 3,
   "numPendingTests": 0,
   "numTodoTests": 0,
   "snapshot": {
@@ -24,127 +24,67 @@
     "updated": 0,
     "didUpdate": false
   },
-  "startTime": 1794050482333,
-  "success": true,
+  "startTime": 1794050611165,
+  "success": false,
   "testResults": [
     {
       "assertionResults": [
         {
-          "ancestorTitles": ["成果物ハッシュの検証"],
-          "fullName": "成果物ハッシュの検証 16 進数だけをブランド型にする",
-          "status": "passed",
-          "title": "16 進数だけをブランド型にする",
-          "duration": 1.492750000000001,
-          "failureMessages": [],
+          "ancestorTitles": ["管理 API の一連の操作"],
+          "fullName": "管理 API の一連の操作 キーを発行できる",
+          "status": "failed",
+          "title": "キーを発行できる",
+          "duration": 17,
+          "failureMessages": [
+            "AssertionError: expected 500 to be 200 // Object.is equality\n    at /Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/admin-flow.test.ts:69:29\n    at Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/node_modules/.pnpm/vitest@5.1.0_@types+node@24.10.1_vite@8.3.6_@types+node@24.10.1_esbuild@0.28.2_jiti@2.7.0_tsx@4.23.15_yaml@2.9.1_/node_modules/vitest/dist/chunks/run.CjdgFZiW.js:2801:20"
+          ],
           "meta": {},
           "tags": [],
           "benchmarks": []
         },
         {
-          "ancestorTitles": ["R2 の保存キー"],
-          "fullName": "R2 の保存キー リポジトリごとに分離し、ハッシュを小文字にする",
-          "status": "passed",
-          "title": "リポジトリごとに分離し、ハッシュを小文字にする",
-          "duration": 0.2858750000000043,
-          "failureMessages": [],
+          "ancestorTitles": ["管理 API の一連の操作"],
+          "fullName": "管理 API の一連の操作 発行したキーが一覧に出る",
+          "status": "failed",
+          "title": "発行したキーが一覧に出る",
+          "duration": 11,
+          "failureMessages": [
+            "Error: キー発行の応答が不正: {\"json\":{\"defined\":false,\"code\":\"INTERNAL_SERVER_ERROR\",\"status\":500,\"message\":\"Internal server error\"}}\n    at parseIssued (/Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/admin-flow.test.ts:60:11)\n    at /Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/admin-flow.test.ts:78:20\n    at Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/node_modules/.pnpm/vitest@5.1.0_@types+node@24.10.1_vite@8.3.6_@types+node@24.10.1_esbuild@0.28.2_jiti@2.7.0_tsx@4.23.15_yaml@2.9.1_/node_modules/vitest/dist/chunks/run.CjdgFZiW.js:2801:20"
+          ],
           "meta": {},
           "tags": [],
           "benchmarks": []
         },
         {
-          "ancestorTitles": ["スコープの権限"],
-          "fullName": "スコープの権限 read と read-write を区別する",
-          "status": "passed",
-          "title": "read と read-write を区別する",
-          "duration": 0.7244579999999985,
-          "failureMessages": [],
+          "ancestorTitles": ["管理 API の一連の操作"],
+          "fullName": "管理 API の一連の操作 失効するとキャッシュ API で使えなくなる",
+          "status": "failed",
+          "title": "失効するとキャッシュ API で使えなくなる",
+          "duration": 4,
+          "failureMessages": [
+            "Error: キー発行の応答が不正: {\"json\":{\"defined\":false,\"code\":\"INTERNAL_SERVER_ERROR\",\"status\":500,\"message\":\"Internal server error\"}}\n    at parseIssued (/Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/admin-flow.test.ts:60:11)\n    at /Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/admin-flow.test.ts:103:20\n    at Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/node_modules/.pnpm/vitest@5.1.0_@types+node@24.10.1_vite@8.3.6_@types+node@24.10.1_esbuild@0.28.2_jiti@2.7.0_tsx@4.23.15_yaml@2.9.1_/node_modules/vitest/dist/chunks/run.CjdgFZiW.js:2801:20"
+          ],
           "meta": {},
           "tags": [],
           "benchmarks": []
         },
         {
-          "ancestorTitles": ["teamId / slug の照合"],
-          "fullName": "teamId / slug の照合 未指定は許可する",
+          "ancestorTitles": ["管理 API の一連の操作"],
+          "fullName": "管理 API の一連の操作 Origin が一致しない変更操作を拒否する",
           "status": "passed",
-          "title": "未指定は許可する",
-          "duration": 0.17191700000000765,
-          "failureMessages": [],
-          "meta": {},
-          "tags": [],
-          "benchmarks": []
-        },
-        {
-          "ancestorTitles": ["teamId / slug の照合"],
-          "fullName": "teamId / slug の照合 一致する teamId / slug は許可する",
-          "status": "passed",
-          "title": "一致する teamId / slug は許可する",
-          "duration": 0.1210839999999962,
-          "failureMessages": [],
-          "meta": {},
-          "tags": [],
-          "benchmarks": []
-        },
-        {
-          "ancestorTitles": ["teamId / slug の照合"],
-          "fullName": "teamId / slug の照合 不一致は拒否する",
-          "status": "passed",
-          "title": "不一致は拒否する",
-          "duration": 0.12504100000001017,
-          "failureMessages": [],
-          "meta": {},
-          "tags": [],
-          "benchmarks": []
-        },
-        {
-          "ancestorTitles": ["teamId / slug の照合"],
-          "fullName": "teamId / slug の照合 teamId が未設定のリポジトリに teamId を指定すると拒否する",
-          "status": "passed",
-          "title": "teamId が未設定のリポジトリに teamId を指定すると拒否する",
-          "duration": 0.10758400000000279,
-          "failureMessages": [],
-          "meta": {},
-          "tags": [],
-          "benchmarks": []
-        },
-        {
-          "ancestorTitles": ["成果物メタデータの読み取り"],
-          "fullName": "成果物メタデータの読み取り ヘッダーを読み取る",
-          "status": "passed",
-          "title": "ヘッダーを読み取る",
-          "duration": 21.289458999999994,
-          "failureMessages": [],
-          "meta": {},
-          "tags": [],
-          "benchmarks": []
-        },
-        {
-          "ancestorTitles": ["成果物メタデータの読み取り"],
-          "fullName": "成果物メタデータの読み取り duration が数値でなければ拒否する",
-          "status": "passed",
-          "title": "duration が数値でなければ拒否する",
-          "duration": 0.1613749999999925,
-          "failureMessages": [],
-          "meta": {},
-          "tags": [],
-          "benchmarks": []
-        },
-        {
-          "ancestorTitles": ["成果物メタデータの読み取り"],
-          "fullName": "成果物メタデータの読み取り 600 文字を超える tag を拒否する",
-          "status": "passed",
-          "title": "600 文字を超える tag を拒否する",
-          "duration": 0.13325000000000387,
+          "title": "Origin が一致しない変更操作を拒否する",
+          "duration": 2,
           "failureMessages": [],
           "meta": {},
           "tags": [],
           "benchmarks": []
         }
       ],
-      "startTime": 1794050482462,
-      "endTime": 1794050482487.2896,
-      "status": "passed",
+      "startTime": 1794050613496,
+      "endTime": 1794050613530,
+      "status": "failed",
       "message": "",
-      "name": "/Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/packages/domain/test/artifact.test.ts"
+      "name": "/Users/koralle/.herdr/worktrees/turborepo-remote-cache-server/feat-implement-poc/apps/api/test/admin-flow.test.ts"
     }
   ]
 }

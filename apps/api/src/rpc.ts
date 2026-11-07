@@ -140,7 +140,7 @@ export const createRpcHandler = (env: AppEnv) => {
         const created = await auth.api.createApiKey({
           body: {
             userId: session.user.id,
-            name: `${input.repositorySlug} (${input.scope})`,
+            name: input.scope === "read" ? "read-only" : "read-write",
             expiresIn: input.expiresInDays * 24 * 60 * 60,
             permissions: permissionsForScope(input.scope),
             metadata: { repositoryId, scope: input.scope },
