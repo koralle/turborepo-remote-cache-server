@@ -12,3 +12,6 @@ worker-configuration.d.ts
 !.dev.vars.example
 !.env.example
 .DS_Store
+.pi/goals/
+.pi/git/
+.pi/.goals-pool-snapshot.json

@@ -12,6 +12,7 @@ export default defineConfig({
     ...(core.ignorePatterns ?? []),
     "**/*.gen.ts",
     "**/worker-configuration.d.ts",
+    "packages/api-contract/src/turborepo",
     "packages/web/styled-system",
   ],
 });

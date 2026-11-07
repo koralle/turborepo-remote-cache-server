@@ -7,3 +7,5 @@ styled-system/
 worker-configuration.d.ts
 *.gen.ts
 pnpm-lock.yaml
+packages/api-contract/spec/*.json
+packages/api-contract/src/turborepo/
