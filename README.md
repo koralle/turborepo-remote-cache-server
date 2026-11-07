@@ -32,7 +32,6 @@
 ```sh
 pnpm install --frozen-lockfile
 pnpm run types          # wrangler types（binding 型）
-pnpm run db:migrate     # ローカル D1 にマイグレーション適用
 cp apps/api/.dev.vars.example apps/api/.dev.vars
 # BETTER_AUTH_SECRET を openssl rand -base64 32 などで設定
 pnpm dev                # ローカル D1 を migrate し、Web (3000) + API auxiliary Worker を起動
@@ -40,7 +39,8 @@ pnpm admin:setup        # 管理者のメールアドレスを入力し、パス
 ```
 
 `pnpm dev` は Vite の port 3000（`strictPort`）で Web を起動し、`apps/api` の Worker を同時に起動する。
-D1 は `apps/web/.wrangler/state/v3` に保存し、`pnpm dev` が起動前にマイグレーションする（`pnpm db:migrate` は API 単体/E2E 用の `apps/api` 側）。ブラウザで `http://localhost:3000/setup#token=...` を開き、パスキーを登録してログインする。
+D1 は `apps/web/.wrangler/state/v3` に保存し、`pnpm dev` が起動前にマイグレーションする。
+`pnpm db:migrate` は API 単体（`wrangler dev`）と E2E 用で、`apps/api/.wrangler` 側を使う。ブラウザで `http://localhost:3000/setup#token=...` を開き、パスキーを登録してログインする。
 ローカルの Turborepo は `TURBO_API=http://localhost:3000`（Web が `/v8` を Service Binding で転送）で接続できる。
 
 ## 環境変数と Secret
