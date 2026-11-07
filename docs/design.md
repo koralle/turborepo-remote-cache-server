@@ -92,8 +92,8 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
   3. `https://<web>/setup#token=...` を表示する。トークンは URL フラグメントなのでサーバーログに残らない。
   4. `/setup` が `passkey.addPasskey({ context: token, createSession: true })` を呼ぶ。
 - `resolveUser` は署名・期限を検証し、ユーザーが無ければ作る。`reset` 付きなら既存のパスキーとセッションを削除する。
-- 復旧は `pnpm admin:setup --reset`。パスキーを失った管理者は新しいパスキーを登録し直す。
-- Admin プラグインは採用しない。ユーザー管理・BAN・なりすまし API は不要。利用者は管理者 1 人だけなので、セッションの存在が管理者権限になる。
+- 復旧は `pnpm admin:setup -- --reset`。パスキーを失った管理者は新しいパスキーを登録し直す。
+- Admin プラグインは採用しない。ユーザー管理・BAN・なりすまし API は不要。利用者は CLI で作る管理者 1 人だけで、管理 API は `user.role === "admin"` を要求する。
 
 ### API キー
 
@@ -118,7 +118,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 ## 6. 公開経路
 
 - **本番（想定）**: API Worker を `cache.<domain>`（カスタムドメイン）または `<name>.<account>.workers.dev` に公開。`TURBO_API=https://cache.<domain>`、`TURBO_TOKEN=<API キー>`、`TURBO_TEAM=<リポジトリ slug>`。
-- **ローカル**: Web は Vite の port 3000 + `strictPort`。API は Vite の `auxiliaryWorkers` で同時起動し、`wrangler dev` のポート（既定 8787）を `TURBO_API=http://localhost:8787` に使う。
+- **ローカル**: Web は Vite の port 3000 + `strictPort`。API は Vite の `auxiliaryWorkers` で同時起動する。Web が `/v8` と `/artifacts` も Service Binding で API に転送するため、`TURBO_API=http://localhost:3000` で CLI から到達できる。D1 は Vite の永続化先 `apps/web/.wrangler/state/v3` を使い、`pnpm dev` が起動前にマイグレーションする。API 単体や E2E は `apps/api/.wrangler/state/v3` を使う。
 - ブラウザからは Web の同一オリジンのみ。`/api/auth/*` と `/rpc/*` を Service Binding（`env.API.fetch`）で API に転送し、Cookie と `Set-Cookie` をそのまま通す。
 - API Worker の `baseURL` は Web のオリジン。`trustedOrigins` も Web のオリジン。Cookie は `HttpOnly`、`SameSite=Lax`、本番は `Secure`。
 - oRPC の変更系は `Origin` ヘッダー一致を追加で確認する。
@@ -127,7 +127,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 
 ## 7. teamId / slug とリポジトリ
 
-- `repositories`: `id`（ULID）、`slug`（一意、例 `acme/web`）、`teamId`（任意、Turbo の `TURBO_TEAM` に数値 ID を使う場合）、`createdAt`。
+- `repositories`: `id`（UUID）、`slug`（一意、例 `acme/web`）、`teamId`（任意、Turbo の `TURBO_TEAM` に数値 ID を使う場合）、`createdAt`。
 - キー発行時にリポジトリを選択（既存から選ぶ or slug を入力して作成）。
 - リクエストの `teamId` / `slug` は「そのリポジトリの別名」との照合のみ。
   - 両方未指定: 許可（キーがリポジトリを決める）。

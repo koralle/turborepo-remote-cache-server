@@ -1,7 +1,7 @@
 import handler from "@tanstack/react-start/server-entry";
 import { env } from "cloudflare:workers";
 
-const proxied = ["/api/auth", "/rpc"];
+const proxied = ["/api/auth", "/rpc", "/v8", "/artifacts"];
 
 const isProxied = (pathname: string): boolean =>
   proxied.some(

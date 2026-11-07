@@ -15,7 +15,7 @@
     "check:migrations": "./scripts/check-migrations.sh HEAD",
     "admin:setup": "pnpm --filter @repo/api run admin:setup",
     "test": "vitest run",
-    "dev": "pnpm --filter @repo/web run dev",
+    "dev": "pnpm --filter @repo/web run db:migrate && pnpm --filter @repo/web run dev",
     "build": "pnpm -r --if-present run build",
     "generate": "pnpm -r --if-present run generate",
     "deploy": "pnpm run deploy:api && pnpm run deploy:web",

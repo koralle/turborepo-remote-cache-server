@@ -12,7 +12,8 @@
     "types": "wrangler types",
     "storybook": "panda codegen && storybook dev -p 6006",
     "storybook:build": "panda codegen && storybook build",
-    "generate": "panda codegen && node ../../scripts/panda-hash.ts"
+    "generate": "panda codegen && node ../../scripts/panda-hash.ts",
+    "db:migrate": "wrangler d1 migrations apply turbo-remote-cache --local --persist-to \"$(pwd)/.wrangler/state\" -c ../api/wrangler.jsonc"
   },
   "dependencies": {
     "@better-auth/passkey": "catalog:auth",

@@ -35,12 +35,13 @@ pnpm run types          # wrangler types（binding 型）
 pnpm run db:migrate     # ローカル D1 にマイグレーション適用
 cp apps/api/.dev.vars.example apps/api/.dev.vars
 # BETTER_AUTH_SECRET を openssl rand -base64 32 などで設定
+pnpm dev                # ローカル D1 を migrate し、Web (3000) + API auxiliary Worker を起動
 pnpm admin:setup        # 管理者のメールアドレスを入力し、パスキー登録 URL を表示
-pnpm dev                # Web (3000) + API auxiliary Worker
 ```
 
 `pnpm dev` は Vite の port 3000（`strictPort`）で Web を起動し、`apps/api` の Worker を同時に起動する。
-ブラウザで `http://localhost:3000/setup#token=...` を開き、パスキーを登録してログインする。
+D1 は `apps/web/.wrangler/state/v3` に保存し、`pnpm dev` が起動前にマイグレーションする（`pnpm db:migrate` は API 単体/E2E 用の `apps/api` 側）。ブラウザで `http://localhost:3000/setup#token=...` を開き、パスキーを登録してログインする。
+ローカルの Turborepo は `TURBO_API=http://localhost:3000`（Web が `/v8` を Service Binding で転送）で接続できる。
 
 ## 環境変数と Secret
 
@@ -93,10 +94,14 @@ pnpm db:migrate:remote  # 本番（Cloudflare の認証情報が必要）
 | `TURBO_TEAM` | `acme/web` | キーに紐付くリポジトリの `slug`（または `teamId`） |
 
 ```sh
-TURBO_API=https://cache.example.com \
+# ローカル（pnpm dev 中）
+TURBO_API=http://localhost:3000 \
 TURBO_TOKEN=trc_xxx \
 TURBO_TEAM=acme/web \
 pnpm turbo run build
+
+# 本番（API Worker を直接公開）
+TURBO_API=https://cache.example.com TURBO_TOKEN=trc_xxx TURBO_TEAM=acme/web pnpm turbo run build
 ```
 
 - 実装パスは `/v8/artifacts/*`（Turbo CLI の実挙動）と接頭辞なしの `/artifacts/*` の両方。
