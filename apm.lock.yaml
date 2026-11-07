@@ -5,8 +5,7 @@ dependencies:
     name: agent-skills
     host: github.com
     resolved_commit: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
-    resolved_ref: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
-    version: unknown
+    version: 0.0.0
     package_type: skill_bundle
     deployed_files:
       - .agents/skills/react-best-practices
@@ -86,6 +85,16 @@ dependencies:
       - .agents/skills/react-best-practices/rules/server-parallel-fetching.md
       - .agents/skills/react-best-practices/rules/server-parallel-nested-fetching.md
       - .agents/skills/react-best-practices/rules/server-serialization.md
+      - .agents/skills/react-view-transitions
+      - .agents/skills/react-view-transitions/AGENTS.md
+      - .agents/skills/react-view-transitions/README.md
+      - .agents/skills/react-view-transitions/SKILL.md
+      - .agents/skills/react-view-transitions/metadata.json
+      - .agents/skills/react-view-transitions/references/css-recipes.md
+      - .agents/skills/react-view-transitions/references/implementation.md
+      - .agents/skills/react-view-transitions/references/nextjs.md
+      - .agents/skills/react-view-transitions/references/patterns.md
+      - .agents/skills/react-view-transitions/references/troubleshooting.md
     deployed_file_hashes:
       .agents/skills/react-best-practices/AGENTS.md: sha256:fc93e7421177bbf869cce892bc60a6c83a4517d974bc3bf65c4e2c1e58a6ccf6
       .agents/skills/react-best-practices/README.md: sha256:9eafb2123d3b8b2aef41fba0db2648a3f4f49996f8c7c8bb2c86263befd8b48a
@@ -163,9 +172,19 @@ dependencies:
       .agents/skills/react-best-practices/rules/server-parallel-fetching.md: sha256:569a2e9fc04f9606686cd75c5894ef8781b502786a7fffe241396846c7733472
       .agents/skills/react-best-practices/rules/server-parallel-nested-fetching.md: sha256:ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3
       .agents/skills/react-best-practices/rules/server-serialization.md: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
+      .agents/skills/react-view-transitions/AGENTS.md: sha256:4bfb2fb46451abace536d85077cc45d98147edf706a418dc15634c5b1ec64d41
+      .agents/skills/react-view-transitions/README.md: sha256:aba31b4ac31c1b13d2a8054179604abd4498b0d7324746635ff0e3b0aea9d608
+      .agents/skills/react-view-transitions/SKILL.md: sha256:693acbddd1d2dcf774286867efbc9a5c09dce2da6f21f8e12618187a92f2106a
+      .agents/skills/react-view-transitions/metadata.json: sha256:b1a5ae09f3904dc83dab79f518d033bd98f1e2f55caabfdb5beeeaaf0ca5e4c2
+      .agents/skills/react-view-transitions/references/css-recipes.md: sha256:f4a5b92a7aad6befd2779e498ab04311277f179b240d2170f0a68a1444024d51
+      .agents/skills/react-view-transitions/references/implementation.md: sha256:87687de5fa2f775a6b5134ee02863ebede9ee6bc42ea8ed99bd53aa5325e78f4
+      .agents/skills/react-view-transitions/references/nextjs.md: sha256:f926a645d5e4c62fcc2d5832be0f3ad048f2ee1d17f8476324e2bc407e4b3a07
+      .agents/skills/react-view-transitions/references/patterns.md: sha256:da24d7f37c7e6b8ecbcf05525ef613d8f5be94655c233d6fa62833c8a746604f
+      .agents/skills/react-view-transitions/references/troubleshooting.md: sha256:aa6811d276dcf06dcc9aba90d1e11e1d0a29146604bf7c89a9e93a6fa8883c7a
     content_hash: sha256:b8b3deaf6288263f3b9cbb1175b2897cb5ca7a639284d8f703fb835111a3b61c
     skill_subset:
       - react-best-practices
+      - react-view-transitions
 deployments:
   - kind: project-relative
     target: opencode
@@ -860,3 +879,93 @@ deployments:
       - vercel-labs/agent-skills
     active_owner: vercel-labs/agent-skills
     content_hash: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: null
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/AGENTS.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:4bfb2fb46451abace536d85077cc45d98147edf706a418dc15634c5b1ec64d41
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/README.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:aba31b4ac31c1b13d2a8054179604abd4498b0d7324746635ff0e3b0aea9d608
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/SKILL.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:693acbddd1d2dcf774286867efbc9a5c09dce2da6f21f8e12618187a92f2106a
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/metadata.json
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:b1a5ae09f3904dc83dab79f518d033bd98f1e2f55caabfdb5beeeaaf0ca5e4c2
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/references/css-recipes.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:f4a5b92a7aad6befd2779e498ab04311277f179b240d2170f0a68a1444024d51
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/references/implementation.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:87687de5fa2f775a6b5134ee02863ebede9ee6bc42ea8ed99bd53aa5325e78f4
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/references/nextjs.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:f926a645d5e4c62fcc2d5832be0f3ad048f2ee1d17f8476324e2bc407e4b3a07
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/references/patterns.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:da24d7f37c7e6b8ecbcf05525ef613d8f5be94655c233d6fa62833c8a746604f
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-view-transitions/references/troubleshooting.md
+    runtime: null
+    scope: project
+    owners:
+      - vercel-labs/agent-skills
+    active_owner: vercel-labs/agent-skills
+    content_hash: sha256:aa6811d276dcf06dcc9aba90d1e11e1d0a29146604bf7c89a9e93a6fa8883c7a
