@@ -16,3 +16,4 @@ worker-configuration.d.ts
 .pi/git/
 .pi/.goals-pool-snapshot.json
 e2e/.seed.sql
+.vitest/
