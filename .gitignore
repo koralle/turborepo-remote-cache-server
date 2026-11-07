@@ -17,3 +17,7 @@ worker-configuration.d.ts
 .pi/.goals-pool-snapshot.json
 e2e/.seed.sql
 .vitest/
+
+
+# APM dependencies
+apm_modules/
