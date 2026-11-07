@@ -1,17 +1,31 @@
+import type { ReadonlyDeep, Tagged } from "type-fest";
+
 export const CACHE_READ = "cache:read";
 export const CACHE_WRITE = "cache:write";
 
 export type CacheScope = "read" | "read-write";
 
+export type RepositoryId = Tagged<string, "RepositoryId">;
+export type ArtifactHash = Tagged<string, "ArtifactHash">;
+
 const hashPattern = /^[a-fA-F0-9]+$/u;
 
-export const isArtifactHash = (value: string): boolean =>
+// 検証を通った値だけをブランド型にする。実行時の検証はここで行う。
+const isArtifactHash = (value: string): value is ArtifactHash =>
   hashPattern.test(value);
+
+const isRepositoryId = (value: string): value is RepositoryId => value !== "";
+
+export const toArtifactHash = (value: string): ArtifactHash | null =>
+  isArtifactHash(value) ? value : null;
+
+export const toRepositoryId = (value: string): RepositoryId | null =>
+  isRepositoryId(value) ? value : null;
 
 // 大文字と小文字で別オブジェクトにならないよう、保存キーは小文字に揃える。
 export const artifactStorageKey = (
-  repositoryId: string,
-  hash: string
+  repositoryId: RepositoryId,
+  hash: ArtifactHash
 ): string => `repos/${repositoryId}/${hash.toLowerCase()}`;
 
 export const permissionsForScope = (
@@ -43,7 +57,7 @@ export interface ArtifactMetadata {
 }
 
 export type ParsedArtifactMetadata =
-  | { ok: true; value: ArtifactMetadata }
+  | { ok: true; value: ReadonlyDeep<ArtifactMetadata> }
   | { ok: false; error: string };
 
 export const parseArtifactMetadata = (

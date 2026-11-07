@@ -2,25 +2,33 @@ import { describe, expect, it } from "vitest";
 
 import {
   artifactStorageKey,
-  isArtifactHash,
   matchesRepositoryQuery,
   parseArtifactMetadata,
   permissionsForScope,
+  toArtifactHash,
+  toRepositoryId,
 } from "../src/artifact.ts";
 
 describe("成果物ハッシュの検証", () => {
-  it("16 進数だけを受け付ける", () => {
-    expect(isArtifactHash("a1b2c3")).toBeTruthy();
-    expect(isArtifactHash("A1B2C3")).toBeTruthy();
-    expect(isArtifactHash("xyz")).toBeFalsy();
-    expect(isArtifactHash("")).toBeFalsy();
+  it("16 進数だけをブランド型にする", () => {
+    expect(toArtifactHash("a1b2c3")).toBe("a1b2c3");
+    expect(toArtifactHash("A1B2C3")).toBe("A1B2C3");
+    expect(toArtifactHash("xyz")).toBeNull();
+    expect(toArtifactHash("")).toBeNull();
   });
 });
 
 describe("R2 の保存キー", () => {
   it("リポジトリごとに分離し、ハッシュを小文字にする", () => {
-    expect(artifactStorageKey("repo-1", "ABC")).toBe("repos/repo-1/abc");
-    expect(artifactStorageKey("repo-2", "ABC")).toBe("repos/repo-2/abc");
+    const hash = toArtifactHash("ABC");
+    const first = toRepositoryId("repo-1");
+    const second = toRepositoryId("repo-2");
+    expect(hash === null || first === null || second === null).toBeFalsy();
+    if (hash === null || first === null || second === null) {
+      throw new Error("ブランド型の生成に失敗した");
+    }
+    expect(artifactStorageKey(first, hash)).toBe("repos/repo-1/abc");
+    expect(artifactStorageKey(second, hash)).toBe("repos/repo-2/abc");
   });
 });
 

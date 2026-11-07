@@ -18,7 +18,7 @@
     "src",
     ".storybook",
     "panda.config.ts",
-    "vite.config.ts",
+    "vite.app.config.ts",
     "worker-configuration.d.ts",
     "routeTree.gen.ts",
     "styled-system"

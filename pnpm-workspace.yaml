@@ -44,9 +44,11 @@ catalogs:
     drizzle-kit: 0.31.11
     drizzle-orm: 0.45.4
   test:
+    type-fest: 5.10.0
     vitest: 5.1.0
   tooling:
     "@tsconfig/strictest": 2.0.8
+    turbo: 2.11.10
     "@types/node": 24.10.1
     knip: 6.44.2
     lefthook: 2.2.2

@@ -2,10 +2,12 @@ import { vArtifactQueryRequest, vCacheEvents } from "@repo/api-contract";
 import { createDb, repositories } from "@repo/db";
 import {
   artifactStorageKey,
-  isArtifactHash,
   matchesRepositoryQuery,
   parseArtifactMetadata,
+  toArtifactHash,
+  toRepositoryId,
 } from "@repo/domain/artifact";
+import type { RepositoryId } from "@repo/domain/artifact";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import * as v from "valibot";
@@ -17,7 +19,11 @@ const defaultMaxBytes = 100 * 1024 * 1024;
 const maxBatchHashes = 100;
 
 interface CacheVariables {
-  repository: { id: string; slug: string; teamId: string | null };
+  repository: {
+    id: RepositoryId;
+    slug: string;
+    teamId: string | null;
+  };
 }
 
 interface CacheEnv {
@@ -181,8 +187,12 @@ export const createCacheRoutes = () => {
       return c.json(errorBody("forbidden", "teamId / slug が一致しない"), 403);
     }
 
+    const storedRepositoryId = toRepositoryId(repository.id);
+    if (storedRepositoryId === null) {
+      return c.json(errorBody("forbidden", "リポジトリ ID が不正"), 403);
+    }
     c.set("repository", {
-      id: repository.id,
+      id: storedRepositoryId,
       slug: repository.slug,
       teamId: repository.teamId,
     });
@@ -197,12 +207,12 @@ export const createCacheRoutes = () => {
   );
 
   cache.on("HEAD", "/artifacts/:hash", async (c) => {
-    const hash = c.req.param("hash");
-    if (!isArtifactHash(hash)) {
+    const parsedHash = toArtifactHash(c.req.param("hash"));
+    if (parsedHash === null) {
       return c.body(null, 400, corsHeaders);
     }
     const object = await c.env.BUCKET.head(
-      artifactStorageKey(c.var.repository.id, hash)
+      artifactStorageKey(c.var.repository.id, parsedHash)
     );
     if (object === null) {
       return c.body(null, 404, corsHeaders);
@@ -215,12 +225,12 @@ export const createCacheRoutes = () => {
   });
 
   cache.get("/artifacts/:hash", async (c) => {
-    const hash = c.req.param("hash");
-    if (!isArtifactHash(hash)) {
+    const parsedHash = toArtifactHash(c.req.param("hash"));
+    if (parsedHash === null) {
       return c.json(errorBody("bad_request", "ハッシュが不正"), 400);
     }
     const object = await c.env.BUCKET.get(
-      artifactStorageKey(c.var.repository.id, hash)
+      artifactStorageKey(c.var.repository.id, parsedHash)
     );
     if (object === null) {
       return c.json(errorBody("not_found", "成果物が無い"), 404);
@@ -238,7 +248,8 @@ export const createCacheRoutes = () => {
 
   cache.put("/artifacts/:hash", async (c) => {
     const hash = c.req.param("hash");
-    if (!isArtifactHash(hash)) {
+    const parsedHash = toArtifactHash(hash);
+    if (parsedHash === null) {
       return c.json(errorBody("bad_request", "ハッシュが不正"), 400);
     }
 
@@ -274,7 +285,7 @@ export const createCacheRoutes = () => {
     }
 
     const stored = await c.env.BUCKET.put(
-      artifactStorageKey(c.var.repository.id, hash),
+      artifactStorageKey(c.var.repository.id, parsedHash),
       body,
       {
         customMetadata,
@@ -301,11 +312,12 @@ export const createCacheRoutes = () => {
 
     const entries = await Promise.all(
       parsed.output.hashes.map(async (hash) => {
-        if (!isArtifactHash(hash)) {
+        const parsedHash = toArtifactHash(hash);
+        if (parsedHash === null) {
           return [hash, null] as const;
         }
         const object = await c.env.BUCKET.head(
-          artifactStorageKey(c.var.repository.id, hash)
+          artifactStorageKey(c.var.repository.id, parsedHash)
         );
         return [hash, object === null ? null : batchEntryOf(object)] as const;
       })

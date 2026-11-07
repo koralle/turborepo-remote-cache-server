@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "panda codegen && vite build",
-    "preview": "vite preview",
+    "dev": "vite --config vite.app.config.ts",
+    "build": "panda codegen && vite build --config vite.app.config.ts",
+    "preview": "vite preview --config vite.app.config.ts",
     "deploy": "pnpm run build && wrangler deploy",
     "typecheck": "panda codegen && tsrs --noEmit --fast",
     "types": "wrangler types",
