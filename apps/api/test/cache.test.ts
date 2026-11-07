@@ -296,3 +296,66 @@ describe("サイズと入力の境界", () => {
     expect(response.status).toBe(411);
   });
 });
+
+describe("仕様とのルーティング対応", () => {
+  it("接頭辞なしの PUT を 202 で受け、/v8 から取得できる", async () => {
+    const { key } = await setup();
+    const response = await call(`/artifacts/${hashA}`, {
+      body,
+      headers: {
+        authorization: `Bearer ${key}`,
+        "content-length": String(body.length),
+        "x-artifact-tag": "dGFn",
+      },
+      method: "PUT",
+    });
+    expect(response.status).toBe(202);
+    const download = await call(`/v8/artifacts/${hashA}`, {
+      headers: { authorization: `Bearer ${key}` },
+    });
+    expect(download.status).toBe(200);
+    expect(download.headers.get("x-artifact-tag")).toBe("dGFn");
+  });
+
+  it("接頭辞なしの HEAD がヘッダーを返す", async () => {
+    const { key } = await setup();
+    await put(key, hashA, body, { "x-artifact-duration": "7" });
+    const head = await call(`/artifacts/${hashA}`, {
+      headers: { authorization: `Bearer ${key}` },
+      method: "HEAD",
+    });
+    expect(head.status).toBe(200);
+    expect(head.headers.get("content-length")).toBe(String(body.length));
+    expect(head.headers.get("x-artifact-duration")).toBe("7");
+  });
+
+  it("OPTIONS が認証ヘッダーを許可する", async () => {
+    const response = await call(`/v8/artifacts/status`, { method: "OPTIONS" });
+    expect(response.status).toBe(204);
+    expect(response.headers.get("access-control-allow-headers")).toContain(
+      "authorization"
+    );
+    expect(response.headers.get("access-control-allow-methods")).toContain(
+      "PUT"
+    );
+  });
+
+  it("status と一括照会が仕様のパスで動く", async () => {
+    const { key } = await setup();
+    const status = await call("/artifacts/status", {
+      headers: { authorization: `Bearer ${key}` },
+    });
+    expect(status.status).toBe(200);
+    await expect(status.json()).resolves.toStrictEqual({ status: "enabled" });
+
+    const batch = await call("/artifacts", {
+      body: JSON.stringify({ hashes: [hashA] }),
+      headers: {
+        authorization: `Bearer ${key}`,
+        "content-type": "application/json",
+      },
+      method: "POST",
+    });
+    expect(batch.status).toBe(200);
+  });
+});
