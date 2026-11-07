@@ -1,6 +1,6 @@
-# 実装計画（合意用ドラフト）
+# 設計
 
-最終更新: 2026-11-07。合意後に `docs/design.md` として確定し、実装内容に合わせて更新する。
+最終更新: 2026-11-07。決定済みの内容と、その理由を残す。
 
 ## 1. 結論（推奨案）
 
@@ -57,7 +57,7 @@ packages/
 
 ## 4. DB: D1 と Turso/libSQL の比較
 
-| 観点 | D1（推奨） | Turso/libSQL |
+| 観点 | D1（採用） | Turso/libSQL（不採用） |
 | --- | --- | --- |
 | Workers からの接続 | binding（`drizzle-orm/d1`）。認証情報を Worker に置かない | `@libsql/client`（HTTP）。URL とトークンを Secret で渡す |
 | ローカル開発 | Miniflare のローカル D1。追加プロセス不要 | `turso dev`（Turso CLI）か Turso の実 DB が必要 |
@@ -67,7 +67,7 @@ packages/
 | 障害点 | Cloudflare 内で完結 | 外部サービス + ネットワーク + 認証情報 |
 | この用途との相性 | 認証とリポジトリ台帳だけ。容量・同時実行は十分 | 大規模・多地域向け。今回の規模では過剰 |
 
-### 推奨: D1
+### 選定理由: D1
 
 理由:
 
@@ -82,14 +82,18 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 
 ## 5. 認証・API キー・権限
 
-### 管理者ログイン
+### 管理者ログイン（パスキー）
 
-- Better Auth のメール + パスワード。`emailAndPassword.disableSignUp: true` で公開サインアップを禁止。
-- パスワードは Better Auth の標準ハッシュ。平文は保存しない。
-- 初期登録: `pnpm admin:create`（`packages/db` の CLI）。メールとパスワードを**標準入力（非表示プロンプト）または環境変数**で受け取り、`better-auth/crypto` の `hashPassword` で保存。argv では受け取らない。既に利用者がいる場合は中断。
-- 復旧: `pnpm admin:reset-password`。同じく標準入力。セッションは全削除して再ログインさせる。
-- パスキーは今回採用しない。理由: 最初の利用者を作るには結局パスワードか手作業の DB 投入が必要で、復旧も端末依存になる。`@better-auth/passkey` を追加すれば後から第 2 要素として足せる。
-- Admin プラグインは採用しない。管理画面の代替ではなく、ユーザー管理・BAN・なりすまし API が増えるだけ。`user.role` を `additionalFields` で `admin` として持ち、oRPC で `role === "admin"` を要求する。
+- `@better-auth/passkey` の `passkey()` を `registration.requireSession: false` で使う。`resolveUser` が署名済みトークンを検証し、`createSession: true` で登録後にセッションを張る。
+- 公開サインアップは無い。`emailAndPassword` は無効。ログインは `signIn.passkey()` の 1 ボタン（ユーザー名なし）。
+- 初期登録・復旧は `pnpm admin:setup`:
+  1. メールアドレスを標準入力で受け取る（CLI 引数に秘密を渡さない）。
+  2. `BETTER_AUTH_SECRET` で HMAC 署名した 10 分有効のトークンを作る（payload: `email`, `exp`, `reset`）。
+  3. `https://<web>/setup#token=...` を表示する。トークンは URL フラグメントなのでサーバーログに残らない。
+  4. `/setup` が `passkey.addPasskey({ context: token, createSession: true })` を呼ぶ。
+- `resolveUser` は署名・期限を検証し、ユーザーが無ければ作る。`reset` 付きなら既存のパスキーとセッションを削除する。
+- 復旧は `pnpm admin:setup --reset`。パスキーを失った管理者は新しいパスキーを登録し直す。
+- Admin プラグインは採用しない。ユーザー管理・BAN・なりすまし API は不要。利用者は管理者 1 人だけなので、セッションの存在が管理者権限になる。
 
 ### API キー
 
@@ -184,7 +188,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 | `deploy:api` / `deploy:web` | 個別 |
 | `db:generate` / `db:migrate` | Drizzle Kit / wrangler d1 |
 | `storybook` / `storybook:build` | Storybook |
-| `admin:create` / `admin:reset-password` | 管理者の作成・復旧 |
+| `admin:setup` | 管理者パスキーの初期登録・復旧（`--reset`） |
 
 - Panda codegen は Web の build / typecheck / Storybook build の前に実行。
 - pre-commit: 修正 + 型検査。pre-push: Knip。
@@ -221,15 +225,16 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 - 1 API キー = 1 リポジトリ。複数リポジトリを 1 キーで共有する構成は提供しない。
 - events は受け取るが永続化しない（分析 UI なし）。
 - Turso/libSQL を選ばないため `@libsql/client` は導入しない。
-- パスキーは導入しない（後から追加可能な設計にする）。
+- 管理者は 1 人（複数管理者・権限分割は未対応）。
 - 保持期間は R2 ライフサイクルに依存し、アプリからの削除 API は作らない。
 - 本番 Cloudflare リソースの作成とデプロイは、承認後に別途行う。
 - OpenAPI のコード生成は行わない。仕様（`packages/api-contract/spec/`）を出典として、型と Valibot スキーマを手書きで維持する。
 
-## 14. 合意してほしい点
+## 14. 決定の記録
 
-1. DB は D1 で進めるか（代替: Turso/libSQL）。
-2. 公開経路は API Worker の直接公開か（代替: Web Worker 経由の転送）。
-3. 管理者ログインはメール + パスワード + CLI 復旧か（代替: パスキー）。
-4. API キーの権限は「読み取り専用 / 読み書き」の 2 種で足りるか。
-5. `teamId` / `slug` は「一致確認のみ、未指定は許可」で良いか。
+- 2026-11-07: DB は D1（Turso/libSQL は不採用）。
+- 2026-11-07: Turborepo CLI は API Worker の直接公開経路を使う。
+- 2026-11-07: 管理者はパスキーのみ。初期登録・復旧は署名済みトークン + `/setup`。
+- 2026-11-07: API キーの権限は read / read+write の 2 種。
+- 2026-11-07: teamId / slug は一致確認のみ、未指定は許可。
+- 2026-11-07: OpenAPI コード生成は不採用。TypeScript 7 を優先し、契約は手書き。

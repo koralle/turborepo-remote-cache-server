@@ -4,10 +4,15 @@
   "type": "module",
   "scripts": {
     "typecheck": "pnpm -r --if-present run typecheck",
-    "check": "pnpm run typecheck && oxlint --type-aware && oxfmt -c oxfmt.config.ts --check && knip",
+    "check": "pnpm run types && pnpm run typecheck && oxlint --type-aware && oxfmt -c oxfmt.config.ts --check && knip",
     "fix": "oxlint --type-aware --fix && oxfmt -c oxfmt.config.ts",
     "knip": "knip",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "db:generate": "pnpm --filter @repo/db run generate",
+    "db:migrate": "pnpm --filter @repo/api run db:migrate",
+    "db:migrate:remote": "pnpm --filter @repo/api run db:migrate:remote",
+    "types": "pnpm -r --if-present run types",
+    "check:migrations": "./scripts/check-migrations.sh HEAD"
   },
   "devDependencies": {
     "@types/node": "catalog:tooling",
