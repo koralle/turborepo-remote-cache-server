@@ -13,6 +13,7 @@ export const vCachingStatus = v.picklist([
   "over_limit",
   "paused",
 ]);
+
 export const vCachingStatusResponse = v.object({ status: vCachingStatus });
 
 export const vArtifactInfo = v.object({
@@ -62,14 +63,21 @@ export const vApiErrorBody = v.intersect([
 ]);
 
 export type ApiError = v.InferOutput<typeof vApiError>;
+
 export type ArtifactInfo = v.InferOutput<typeof vArtifactInfo>;
+
 export type ArtifactQueryEntry = v.InferOutput<typeof vArtifactQueryEntry>;
+
 export type ArtifactQueryRequest = v.InferOutput<typeof vArtifactQueryRequest>;
+
 export type ArtifactUploadResponse = v.InferOutput<
   typeof vArtifactUploadResponse
 >;
+
 export type CacheEvent = v.InferOutput<typeof vCacheEvent>;
+
 export type CachingStatus = v.InferOutput<typeof vCachingStatus>;
+
 export type CachingStatusResponse = v.InferOutput<
   typeof vCachingStatusResponse
 >;

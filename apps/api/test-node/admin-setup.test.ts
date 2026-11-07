@@ -20,6 +20,7 @@ describe("admin:setup", () => {
       BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret",
       WEB_ORIGIN: "http://localhost:3000",
     });
+
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("http://localhost:3000/setup#token=");
   });
@@ -28,6 +29,7 @@ describe("admin:setup", () => {
     const result = run({
       BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret",
     });
+
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("WEB_ORIGIN");
   });

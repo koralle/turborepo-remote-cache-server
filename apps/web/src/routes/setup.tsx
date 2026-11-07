@@ -22,18 +22,23 @@ const SetupRoute = () => {
     if (token === null) {
       return;
     }
+
     setPending(true);
     setError(null);
+
     try {
       const result = await authClient.passkey.addPasskey({
         context: token,
         createSession: true,
         name: "管理者パスキー",
       });
+
       if (result.error) {
         setError(result.error.message ?? "パスキーを登録できませんでした");
+
         return;
       }
+
       window.location.assign("/keys");
     } catch (error_) {
       setError(
@@ -42,6 +47,7 @@ const SetupRoute = () => {
           : "パスキーを登録できませんでした"
       );
     }
+
     setPending(false);
   };
 

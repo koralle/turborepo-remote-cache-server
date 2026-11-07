@@ -21,9 +21,11 @@ const readSpecInfo = (text: string): SpecInfo => {
 
 const main = async (): Promise<void> => {
   const response = await fetch(source);
+
   if (!response.ok) {
     throw new Error(`${source} の取得に失敗した: ${response.status}`);
   }
+
   const body = await response.text();
   const spec = readSpecInfo(body);
 

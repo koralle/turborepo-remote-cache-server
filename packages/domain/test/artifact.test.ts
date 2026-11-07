@@ -24,9 +24,11 @@ describe("R2 の保存キー", () => {
     const first = toRepositoryId("repo-1");
     const second = toRepositoryId("repo-2");
     expect(hash === null || first === null || second === null).toBeFalsy();
+
     if (hash === null || first === null || second === null) {
       throw new Error("ブランド型の生成に失敗した");
     }
+
     expect(artifactStorageKey(first, hash)).toBe("repos/repo-1/abc");
     expect(artifactStorageKey(second, hash)).toBe("repos/repo-2/abc");
   });
@@ -81,6 +83,7 @@ describe("成果物メタデータの読み取り", () => {
       "x-artifact-sha": "sha",
       "x-artifact-tag": "tag",
     });
+
     expect(parseArtifactMetadata(headers)).toStrictEqual({
       ok: true,
       value: { dirtyHash: "dirty", durationMs: 42, sha: "sha", tag: "tag" },

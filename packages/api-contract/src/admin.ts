@@ -57,4 +57,5 @@ export const adminContract = {
 };
 
 export type KeySummary = v.InferOutput<typeof vKeySummary>;
+
 export type Repository = v.InferOutput<typeof vRepository>;

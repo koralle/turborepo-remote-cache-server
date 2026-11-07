@@ -18,6 +18,7 @@ export const seedUser = async (): Promise<string> => {
     createdAt: now,
     updatedAt: now,
   });
+
   return id;
 };
 
@@ -29,6 +30,7 @@ export const seedRepository = async (
   await db
     .insert(repositories)
     .values({ id, slug, teamId, createdAt: new Date() });
+
   return id;
 };
 
@@ -52,6 +54,7 @@ export const issueKey = async (options: KeyOptions): Promise<string> => {
           : { cache: ["read", "write"] },
     },
   });
+
   return created.key;
 };
 
@@ -60,5 +63,6 @@ export const call = async (
   init: RequestInit = {}
 ): Promise<Response> => {
   const { default: app } = await import("../src/index.ts");
+
   return await app.request(path, init, env);
 };

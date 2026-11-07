@@ -71,11 +71,13 @@ export const createAuth = (env: AppEnv) => {
             if (context === null || context === undefined || context === "") {
               throw new Error("セットアップトークンが必要");
             }
+
             const payload = await verifySetupToken(
               env.BETTER_AUTH_SECRET,
               context,
               Date.now()
             );
+
             if (payload === null) {
               throw new Error("セットアップトークンが無効か期限切れ");
             }
@@ -97,6 +99,7 @@ export const createAuth = (env: AppEnv) => {
                 createdAt: now,
                 updatedAt: now,
               });
+
               return { id, name: payload.email };
             }
 
@@ -105,6 +108,7 @@ export const createAuth = (env: AppEnv) => {
                 .delete(passkeyTable)
                 .where(eq(passkeyTable.userId, existing.id));
               await db.delete(session).where(eq(session.userId, existing.id));
+
               return { id: existing.id, name: existing.email };
             }
 
@@ -112,11 +116,13 @@ export const createAuth = (env: AppEnv) => {
               .select({ value: count() })
               .from(passkeyTable)
               .where(eq(passkeyTable.userId, existing.id));
+
             if ((registered[0]?.value ?? 0) > 0) {
               throw new Error(
                 "この利用者には既にパスキーがある。復旧には --reset を使う"
               );
             }
+
             return { id: existing.id, name: existing.email };
           },
         },

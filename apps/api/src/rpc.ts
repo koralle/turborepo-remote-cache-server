@@ -15,28 +15,16 @@ interface AdminContext {
   headers: Headers;
 }
 
-const metadataSchema = v.object({
+const metadataObjectSchema = v.object({
   repositoryId: v.string(),
   scope: v.picklist(["read", "read-write"]),
 });
 
-const readMetadata = (
-  metadata: unknown
-): v.InferOutput<typeof metadataSchema> | null => {
-  const parsed = v.safeParse(metadataSchema, metadata);
-  if (parsed.success) {
-    return parsed.output;
-  }
-  if (typeof metadata !== "string") {
-    return null;
-  }
-  try {
-    const inner = v.safeParse(metadataSchema, JSON.parse(metadata));
-    return inner.success ? inner.output : null;
-  } catch {
-    return null;
-  }
-};
+// Better Auth はメタデータを JSON 文字列で返す場合もあるため、両表現を 1 つの境界で受ける。
+const metadataSchema = v.union([
+  metadataObjectSchema,
+  v.pipe(v.string(), v.parseJson(), metadataObjectSchema),
+]);
 
 export const createRpcHandler = (env: AppEnv) => {
   const db = createDb(env.DB);
@@ -45,12 +33,15 @@ export const createRpcHandler = (env: AppEnv) => {
 
   const requireAdmin = async (headers: Headers) => {
     const session = await auth.api.getSession({ headers });
+
     if (session === null) {
       throw new ORPCError("UNAUTHORIZED");
     }
+
     if (session.user.role !== "admin") {
       throw new ORPCError("FORBIDDEN", { message: "管理者ではない" });
     }
+
     return session;
   };
 
@@ -64,10 +55,12 @@ export const createRpcHandler = (env: AppEnv) => {
     repositories: {
       list: os.repositories.list.handler(async ({ context }) => {
         await requireAdmin(context.headers);
+
         const rows = await db
           .select()
           .from(repositories)
           .orderBy(repositories.slug);
+
         return {
           repositories: rows.map((row) => ({
             id: row.id,
@@ -80,17 +73,22 @@ export const createRpcHandler = (env: AppEnv) => {
     keys: {
       list: os.keys.list.handler(async ({ context }) => {
         await requireAdmin(context.headers);
+
         const result = await auth.api.listApiKeys({
           headers: context.headers,
           query: { limit: 100 },
         });
+
         const rows = await db.select().from(repositories);
         const byId = new Map(rows.map((row) => [row.id, row]));
 
         const keys = result.apiKeys.map((key) => {
-          const metadata = readMetadata(key.metadata);
+          const decoded = v.safeParse(metadataSchema, key.metadata);
+          const metadata = decoded.success ? decoded.output : null;
+
           const repository =
             metadata === null ? undefined : byId.get(metadata.repositoryId);
+
           return {
             id: key.id,
             name: key.name ?? null,
@@ -109,6 +107,7 @@ export const createRpcHandler = (env: AppEnv) => {
             createdAt: new Date(key.createdAt).toISOString(),
           };
         });
+
         return { keys };
       }),
       create: os.keys.create.handler(async ({ input, context }) => {
@@ -123,6 +122,7 @@ export const createRpcHandler = (env: AppEnv) => {
           .get();
 
         let repositoryId: string;
+
         if (existing === undefined) {
           repositoryId = crypto.randomUUID();
           await db.insert(repositories).values({
@@ -137,6 +137,7 @@ export const createRpcHandler = (env: AppEnv) => {
               message: "既存リポジトリの teamId と一致しない",
             });
           }
+
           repositoryId = existing.id;
         }
 
@@ -149,6 +150,7 @@ export const createRpcHandler = (env: AppEnv) => {
             metadata: { repositoryId, scope: input.scope },
           },
         });
+
         if (created.expiresAt === null) {
           throw new ORPCError("INTERNAL_SERVER_ERROR", {
             message: "API キーの期限が設定されなかった",
@@ -168,6 +170,7 @@ export const createRpcHandler = (env: AppEnv) => {
           body: { keyId: input.id, enabled: false },
           headers: context.headers,
         });
+
         return { success: true as const };
       }),
     },

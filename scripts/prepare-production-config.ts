@@ -6,6 +6,7 @@ const { CLOUDFLARE_DATABASE_ID: databaseId, PRODUCTION_WEB_ORIGIN: origin } =
 if (databaseId === undefined || databaseId === "") {
   throw new Error("CLOUDFLARE_DATABASE_ID が必要");
 }
+
 if (origin === undefined || !origin.startsWith("https://")) {
   throw new Error("PRODUCTION_WEB_ORIGIN は https:// で始まる必要がある");
 }

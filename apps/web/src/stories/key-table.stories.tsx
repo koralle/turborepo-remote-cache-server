@@ -8,6 +8,7 @@ const meta = {
 } satisfies Meta<typeof KeyTable>;
 
 export default meta;
+
 type Story = StoryObj<typeof meta>;
 
 const keys = [

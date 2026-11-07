@@ -20,4 +20,5 @@ INSERT INTO apikey (id, config_id, name, start, prefix, key, reference_id, enabl
 `;
 
 await writeFile(new URL(".seed.sql", import.meta.url), sql);
+
 console.log(key);

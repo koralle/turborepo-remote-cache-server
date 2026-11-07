@@ -31,6 +31,7 @@ const fieldStyle = css({
   flexDirection: "column",
   gap: "0.25rem",
 });
+
 const inputStyle = css({
   border: "1px solid gray.300",
   borderRadius: "0.375rem",
@@ -52,12 +53,18 @@ export const IssueKeyForm = ({
       className={css({ display: "flex", flexDirection: "column", gap: "1rem" })}
       onSubmit={(event) => {
         event.preventDefault();
-        onCreate({
+
+        const input = {
           expiresInDays: Number(expiresInDays),
           repositorySlug,
           scope,
-          ...(teamId.trim() === "" ? {} : { teamId: teamId.trim() }),
-        });
+        };
+
+        const trimmedTeamId = teamId.trim();
+
+        onCreate(
+          trimmedTeamId === "" ? input : { ...input, teamId: trimmedTeamId }
+        );
       }}
     >
       <TextField

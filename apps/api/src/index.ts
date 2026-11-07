@@ -10,7 +10,9 @@ const app = new Hono<{ Bindings: AppEnv }>();
 app.get("/health", (c) => c.json({ ok: true }));
 
 const cache = createCacheRoutes();
+
 app.route("/v8", cache);
+
 app.route("/", cache);
 
 app.on(
@@ -21,16 +23,20 @@ app.on(
 
 app.use("/rpc/*", async (c, next) => {
   const handler = createRpcHandler(c.env);
+
   const { matched, response } = await handler.handle(c.req.raw, {
     prefix: "/rpc",
     context: { env: c.env, headers: c.req.raw.headers },
   });
+
   if (matched) {
     return c.newResponse(response.body, response);
   }
+
   // Hono の next() は void を返すため、callback-return の要求と両立しない。
   // oxlint-disable-next-line node/callback-return
   await next();
+
   return c.res;
 });
 

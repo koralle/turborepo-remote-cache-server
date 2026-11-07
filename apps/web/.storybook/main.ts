@@ -6,6 +6,7 @@ const config: StorybookConfig = {
   stories: ["../src/stories/**/*.stories.tsx"],
   viteFinal: (viteConfig) => {
     viteConfig.plugins = [...(viteConfig.plugins ?? []), pandacss()];
+
     return viteConfig;
   },
 };

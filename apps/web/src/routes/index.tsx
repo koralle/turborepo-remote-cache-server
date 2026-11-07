@@ -19,12 +19,16 @@ const LoginRoute = () => {
   const signIn = async () => {
     setPending(true);
     setError(null);
+
     try {
       const result = await authClient.signIn.passkey({ autoFill: false });
+
       if (result.error) {
         setError(result.error.message ?? "パスキーでログインできませんでした");
+
         return;
       }
+
       await navigate({ to: "/keys" });
     } catch (error_) {
       setError(
@@ -33,6 +37,7 @@ const LoginRoute = () => {
           : "パスキーでログインできませんでした"
       );
     }
+
     setPending(false);
   };
 

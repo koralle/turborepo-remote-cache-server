@@ -17,6 +17,7 @@ const setup = async (
   const slug = `acme/web-${crypto.randomUUID()}`;
   const repositoryId = await seedRepository(slug, teamId);
   const key = await issueKey({ repositoryId, scope, userId });
+
   return { key, repositoryId, slug, userId };
 };
 
@@ -41,9 +42,11 @@ const keyRow = async (userId: string) => {
     .select()
     .from(apikey)
     .where(eq(apikey.referenceId, userId));
+
   if (row === undefined) {
     throw new Error("API キーが作成されていない");
   }
+
   return row;
 };
 
@@ -57,6 +60,7 @@ describe("キャッシュ API の認証", () => {
     const response = await call(`/v8/artifacts/${hashA}`, {
       headers: { authorization: "Bearer nope" },
     });
+
     expect(response.status).toBe(401);
   });
 
@@ -103,10 +107,12 @@ describe("成果物の保存と復元", () => {
       "x-artifact-duration": "42",
       "x-artifact-sha": "deadbeef",
     });
+
     const head = await call(`/v8/artifacts/${hashA}`, {
       headers: { authorization: `Bearer ${key}` },
       method: "HEAD",
     });
+
     expect(head.status).toBe(200);
     expect(head.headers.get("content-length")).toBe(String(body.length));
     expect(head.headers.get("x-artifact-duration")).toBe("42");
@@ -117,9 +123,11 @@ describe("成果物の保存と復元", () => {
   it("GET でバイナリと署名タグをそのまま返す", async () => {
     const { key } = await setup();
     await put(key, hashA, body, { "x-artifact-tag": "c2lnbmF0dXJl" });
+
     const download = await call(`/v8/artifacts/${hashA}`, {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(download.status).toBe(200);
     expect(download.headers.get("x-artifact-tag")).toBe("c2lnbmF0dXJl");
     expect(new Uint8Array(await download.arrayBuffer())).toStrictEqual(body);
@@ -127,27 +135,33 @@ describe("成果物の保存と復元", () => {
 
   it("存在しない成果物は HEAD/GET とも 404", async () => {
     const { key } = await setup();
+
     const download = await call(`/v8/artifacts/${hashB}`, {
       headers: { authorization: `Bearer ${key}` },
     });
+
     const head = await call(`/v8/artifacts/${hashB}`, {
       headers: { authorization: `Bearer ${key}` },
       method: "HEAD",
     });
+
     expect(download.status).toBe(404);
     expect(head.status).toBe(404);
   });
 
   it("status を返す", async () => {
     const { key } = await setup();
+
     const status = await call("/v8/artifacts/status", {
       headers: { authorization: `Bearer ${key}` },
     });
+
     await expect(status.json()).resolves.toStrictEqual({ status: "enabled" });
   });
 
   it("events を受け付ける", async () => {
     const { key } = await setup();
+
     const response = await call("/v8/artifacts/events", {
       body: JSON.stringify([
         {
@@ -163,11 +177,13 @@ describe("成果物の保存と復元", () => {
       },
       method: "POST",
     });
+
     expect(response.status).toBe(200);
   });
 
   it("不正な events は 400", async () => {
     const { key } = await setup();
+
     const response = await call("/v8/artifacts/events", {
       body: JSON.stringify([{ event: "NOPE" }]),
       headers: {
@@ -176,12 +192,14 @@ describe("成果物の保存と復元", () => {
       },
       method: "POST",
     });
+
     expect(response.status).toBe(400);
   });
 
   it("一括照会で保存済みと未保存を区別する", async () => {
     const { key } = await setup();
     await put(key, hashA);
+
     const response = await call("/v8/artifacts", {
       body: JSON.stringify({ hashes: [hashA, hashB] }),
       headers: {
@@ -190,12 +208,15 @@ describe("成果物の保存と復元", () => {
       },
       method: "POST",
     });
+
     const payload: unknown = await response.json();
     const parsed = v.safeParse(v.record(v.string(), v.unknown()), payload);
     expect(parsed.success).toBeTruthy();
+
     if (!parsed.success) {
       throw new Error("応答がオブジェクトではない");
     }
+
     expect(parsed.output[hashA]).toBeTruthy();
     expect(parsed.output[hashB]).toBeNull();
   });
@@ -206,9 +227,11 @@ describe("リポジトリ分離と teamId / slug", () => {
     const first = await setup();
     await put(first.key, hashA, body);
     const second = await setup();
+
     const response = await call(`/v8/artifacts/${hashA}`, {
       headers: { authorization: `Bearer ${second.key}` },
     });
+
     expect(response.status).toBe(404);
   });
 
@@ -217,42 +240,52 @@ describe("リポジトリ分離と teamId / slug", () => {
     await put(first.key, hashA, body);
     const second = await setup();
     await put(second.key, hashA, new Uint8Array([1, 2, 3]));
+
     const original = await call(`/v8/artifacts/${hashA}`, {
       headers: { authorization: `Bearer ${first.key}` },
     });
+
     expect(new Uint8Array(await original.arrayBuffer())).toStrictEqual(body);
   });
 
   it("一致する teamId / slug は許可する", async () => {
     const { key, slug } = await setup("read-write", "team-1");
+
     const response = await call(
       `/v8/artifacts/${hashA}?teamId=team-1&slug=${encodeURIComponent(slug)}`,
       { headers: { authorization: `Bearer ${key}` } }
     );
+
     expect(response.status).toBe(404);
   });
 
   it("slug の偽装を拒否する", async () => {
     const { key } = await setup("read-write", "team-1");
+
     const response = await call(`/v8/artifacts/${hashA}?slug=other/repo`, {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(response.status).toBe(403);
   });
 
   it("teamId の偽装を拒否する", async () => {
     const { key } = await setup("read-write", "team-1");
+
     const response = await call(`/v8/artifacts/${hashA}?teamId=team-9`, {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(response.status).toBe(403);
   });
 
   it("teamId 未設定のリポジトリに teamId を指定すると拒否する", async () => {
     const { key } = await setup();
+
     const response = await call(`/v8/artifacts/${hashA}?teamId=team-1`, {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(response.status).toBe(403);
   });
 });
@@ -266,33 +299,40 @@ describe("サイズと入力の境界", () => {
 
   it("不正なハッシュは 400", async () => {
     const { key } = await setup();
+
     const response = await call("/v8/artifacts/zzz", {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(response.status).toBe(400);
   });
 
   it("600 文字を超えるタグは 400", async () => {
     const { key } = await setup();
+
     const response = await put(key, hashA, body, {
       "x-artifact-tag": "a".repeat(601),
     });
+
     expect(response.status).toBe(400);
   });
 
   it("Content-Length が無いアップロードを拒否する", async () => {
     const { key } = await setup();
+
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
         controller.enqueue(body);
         controller.close();
       },
     });
+
     const response = await call(`/v8/artifacts/${hashA}`, {
       body: stream,
       headers: { authorization: `Bearer ${key}` },
       method: "PUT",
     });
+
     expect(response.status).toBe(411);
   });
 });
@@ -300,6 +340,7 @@ describe("サイズと入力の境界", () => {
 describe("仕様とのルーティング対応", () => {
   it("接頭辞なしの PUT を 202 で受け、/v8 から取得できる", async () => {
     const { key } = await setup();
+
     const response = await call(`/artifacts/${hashA}`, {
       body,
       headers: {
@@ -309,10 +350,13 @@ describe("仕様とのルーティング対応", () => {
       },
       method: "PUT",
     });
+
     expect(response.status).toBe(202);
+
     const download = await call(`/v8/artifacts/${hashA}`, {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(download.status).toBe(200);
     expect(download.headers.get("x-artifact-tag")).toBe("dGFn");
   });
@@ -320,10 +364,12 @@ describe("仕様とのルーティング対応", () => {
   it("接頭辞なしの HEAD がヘッダーを返す", async () => {
     const { key } = await setup();
     await put(key, hashA, body, { "x-artifact-duration": "7" });
+
     const head = await call(`/artifacts/${hashA}`, {
       headers: { authorization: `Bearer ${key}` },
       method: "HEAD",
     });
+
     expect(head.status).toBe(200);
     expect(head.headers.get("content-length")).toBe(String(body.length));
     expect(head.headers.get("x-artifact-duration")).toBe("7");
@@ -342,9 +388,11 @@ describe("仕様とのルーティング対応", () => {
 
   it("status と一括照会が仕様のパスで動く", async () => {
     const { key } = await setup();
+
     const status = await call("/artifacts/status", {
       headers: { authorization: `Bearer ${key}` },
     });
+
     expect(status.status).toBe(200);
     await expect(status.json()).resolves.toStrictEqual({ status: "enabled" });
 
@@ -356,6 +404,7 @@ describe("仕様とのルーティング対応", () => {
       },
       method: "POST",
     });
+
     expect(batch.status).toBe(200);
   });
 });

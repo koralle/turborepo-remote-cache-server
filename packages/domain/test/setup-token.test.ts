@@ -7,11 +7,13 @@ const secret = "test-secret-test-secret-test-secret";
 describe("setup token", () => {
   it("署名した内容を検証できる", async () => {
     const exp = Date.now() + 60_000;
+
     const token = await signSetupToken(secret, {
       email: "a@example.com",
       exp,
       reset: false,
     });
+
     await expect(
       verifySetupToken(secret, token, Date.now())
     ).resolves.toStrictEqual({
@@ -23,11 +25,13 @@ describe("setup token", () => {
 
   it("期限切れを拒否する", async () => {
     const exp = Date.now() - 1;
+
     const token = await signSetupToken(secret, {
       email: "a@example.com",
       exp,
       reset: false,
     });
+
     await expect(
       verifySetupToken(secret, token, Date.now())
     ).resolves.toBeNull();
@@ -39,6 +43,7 @@ describe("setup token", () => {
       exp: Date.now() + 60_000,
       reset: false,
     });
+
     await expect(
       verifySetupToken(secret, `${token}x`, Date.now())
     ).resolves.toBeNull();

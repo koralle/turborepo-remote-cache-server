@@ -21,6 +21,7 @@ export default {
     if (isProxied(pathnameOf(request))) {
       return await env.API.fetch(request);
     }
+
     return await handler.fetch(request);
   },
 } satisfies ExportedHandler<Env>;

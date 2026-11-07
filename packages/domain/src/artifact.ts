@@ -6,6 +6,7 @@ export const CACHE_WRITE = "cache:write";
 export type CacheScope = "read" | "read-write";
 
 export type RepositoryId = Tagged<string, "RepositoryId">;
+
 export type ArtifactHash = Tagged<string, "ArtifactHash">;
 
 const hashPattern = /^[a-fA-F0-9]+$/u;
@@ -28,9 +29,7 @@ export const artifactStorageKey = (
   hash: ArtifactHash
 ): string => `repos/${repositoryId}/${hash.toLowerCase()}`;
 
-export const permissionsForScope = (
-  scope: CacheScope
-): Record<string, string[]> => ({
+export const permissionsForScope = (scope: CacheScope) => ({
   cache: scope === "read" ? ["read"] : ["read", "write"],
 });
 
@@ -46,6 +45,7 @@ export const matchesRepositoryQuery = (
   if (query.teamId !== undefined && query.teamId !== repository.teamId) {
     return false;
   }
+
   return query.slug === undefined || query.slug === repository.slug;
 };
 
@@ -64,6 +64,7 @@ export const parseArtifactMetadata = (
   headers: Headers
 ): ParsedArtifactMetadata => {
   const tag = headers.get("x-artifact-tag") ?? undefined;
+
   if (tag !== undefined && tag.length > 600) {
     return {
       ok: false,
@@ -72,12 +73,14 @@ export const parseArtifactMetadata = (
   }
 
   const duration = headers.get("x-artifact-duration") ?? undefined;
+
   const metadata: ArtifactMetadata = {
     tag,
     durationMs: undefined,
     sha: headers.get("x-artifact-sha") ?? undefined,
     dirtyHash: headers.get("x-artifact-dirty-hash") ?? undefined,
   };
+
   if (duration === undefined) {
     return { ok: true, value: metadata };
   }
