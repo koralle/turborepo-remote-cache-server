@@ -1,6 +1,22 @@
 lockfile_version: "1"
 apm_version: 0.35.0
 dependencies:
+  - repo_url: millionco/react-doctor
+    name: react-doctor
+    host: github.com
+    resolved_commit: 9791c32f61fb1477a4f8dd596ff80184ad26b2e3
+    version: 1.0.0
+    package_type: skill_bundle
+    deployed_files:
+      - .agents/skills/react-doctor
+      - .agents/skills/react-doctor/SKILL.md
+      - .agents/skills/react-doctor/references/explain.md
+    deployed_file_hashes:
+      .agents/skills/react-doctor/SKILL.md: sha256:ded3d7d7b77626e5308e028733fddab0b586ea513e2e73eafc94ba56afb4160b
+      .agents/skills/react-doctor/references/explain.md: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
+    content_hash: sha256:9c4d71519f17ec7cdc4ca136d68a174af1cb8b7f94d769624dbc31854a56a5be
+    skill_subset:
+      - react-doctor
   - repo_url: vercel-labs/agent-skills
     name: agent-skills
     host: github.com
@@ -1044,6 +1060,33 @@ deployments:
       - vercel-labs/agent-skills
     active_owner: vercel-labs/agent-skills
     content_hash: sha256:f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-doctor
+    runtime: null
+    scope: project
+    owners:
+      - millionco/react-doctor
+    active_owner: millionco/react-doctor
+    content_hash: null
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-doctor/SKILL.md
+    runtime: null
+    scope: project
+    owners:
+      - millionco/react-doctor
+    active_owner: millionco/react-doctor
+    content_hash: sha256:ded3d7d7b77626e5308e028733fddab0b586ea513e2e73eafc94ba56afb4160b
+  - kind: project-relative
+    target: opencode
+    value: .agents/skills/react-doctor/references/explain.md
+    runtime: null
+    scope: project
+    owners:
+      - millionco/react-doctor
+    active_owner: millionco/react-doctor
+    content_hash: sha256:237dd81672c858c8c52325bafeefdde2d5b842c9a98c2ea6a820534a0df8e927
   - kind: project-relative
     target: opencode
     value: .agents/skills/react-view-transitions

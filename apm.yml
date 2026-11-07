@@ -4,7 +4,8 @@ description: APM project for feat-implement-poc
 author: koralle
 # Which agent platforms to deploy to.
 # Resolution order: --target flag > this field > auto-detect from filesystem.
-# Accepted values: agent-skills, antigravity, claude, codex, copilot, cursor, gemini, grok-bot, grok-build, hermes, kiro, opencode, vscode, windsurf
+# Accepted values: agent-skills, antigravity, claude, codex, copilot, cursor, gemini, grok-bot, grok-build, hermes, kiro,
+# opencode, vscode, windsurf
 targets:
   - opencode
 dependencies:
@@ -14,6 +15,9 @@ dependencies:
         - composition-patterns
         - react-best-practices
         - react-view-transitions
+    - git: millionco/react-doctor
+      skills:
+        - react-doctor
   mcp: []
 includes: auto
 scripts: {}

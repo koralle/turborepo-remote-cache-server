@@ -54,7 +54,9 @@ catalogs:
     lefthook: 2.2.2
     oxfmt: 0.77.0
     oxlint: 1.92.0
+    oxlint-plugin-react-doctor: 0.9.22
     portless: 0.16.0
+    react-doctor: 0.9.22
     tsrs: 0.23.0-ts7.1.0-beta
     typescript: 7.0.2
     ultracite: 8.1.1
