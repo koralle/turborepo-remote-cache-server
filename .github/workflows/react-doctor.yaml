@@ -1,0 +1,38 @@
+name: React Doctor
+
+# React のセキュリティ・パフォーマンス・a11y の静的診断。
+# 既定は advisory（blocking: none）で、PR を赤くせず指摘だけを出す。
+# 慣れてきたら with: で blocking: error を指定してゲート化する。
+# https://www.react.doctor/ci
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+
+concurrency:
+  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 がないと merge-base が取れず、PR の新規指摘だけに絞れない。
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      # millionco/react-doctor v2.4.0
+      - uses: millionco/react-doctor@695e46eee203a5d1855020191aa7e9c010a1250e
+        with:
+          # ローカルの devDependency と同じ版に固定する
+          version: "0.9.22"
+          # doctor.config.ts と同じく厳しめ。PR で新規の指摘が出ると赤になる。
+          blocking: warning

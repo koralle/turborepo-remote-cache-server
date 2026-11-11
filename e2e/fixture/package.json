@@ -1,0 +1,8 @@
+{
+  "name": "e2e-fixture",
+  "private": true,
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "packageManager": "pnpm@12.14.0"
+}

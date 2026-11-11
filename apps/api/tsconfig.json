@@ -1,0 +1,7 @@
+{
+  "extends": "@repo/forge/tsconfig/worker.json",
+  "compilerOptions": {
+    "types": []
+  },
+  "include": ["src", "test", "worker-configuration.d.ts"]
+}

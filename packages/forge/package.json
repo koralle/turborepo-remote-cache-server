@@ -1,0 +1,12 @@
+{
+  "name": "@repo/forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig/*": "./tsconfig/*"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "catalog:tooling"
+  }
+}

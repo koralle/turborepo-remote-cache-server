@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # pnpm ワークスペース。バージョンは pnpm-workspace.yaml のカタログに集約しているので、
+  # 更新 PR は pnpm-workspace.yaml と pnpm-lock.yaml の両方を書き換える。
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+    # 公開直後の壊れた版・乗っ取られた版を拾わないよう、7 日寝かせる（既定は 3 日）。
+    cooldown:
+      default-days: 7
+
+  # workflow の uses: はコミット SHA で固定している。Actions に lockfile という形式は
+  # 無く、この SHA 自体がロック。Dependabot は SHA と # のバージョン表記を一緒に更新する。
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+    cooldown:
+      default-days: 7

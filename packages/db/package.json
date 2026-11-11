@@ -1,0 +1,23 @@
+{
+  "name": "@repo/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "typecheck": "tsrs --noEmit --fast"
+  },
+  "dependencies": {
+    "drizzle-orm": "catalog:db"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:cloudflare",
+    "@repo/forge": "workspace:*",
+    "@tsconfig/strictest": "catalog:tooling",
+    "drizzle-kit": "catalog:db"
+  }
+}

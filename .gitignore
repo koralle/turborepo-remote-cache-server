@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.wrangler/
+.storybook-out/
+storybook-static/
+coverage/
+styled-system/
+worker-configuration.d.ts
+.dev.vars
+.env
+.env.*
+!.dev.vars.example
+!.env.example
+.DS_Store
+.pi/goals/
+.pi/git/
+.pi/.goals-pool-snapshot.json
+e2e/.seed.sql
+.vitest/
+
+
+# APM dependencies
+apm_modules/

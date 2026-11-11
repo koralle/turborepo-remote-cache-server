@@ -1,0 +1,23 @@
+{
+  "name": "@repo/api-contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./turborepo": "./src/turborepo.ts"
+  },
+  "scripts": {
+    "spec:update": "node scripts/update-spec.ts",
+    "typecheck": "tsrs --noEmit --fast"
+  },
+  "dependencies": {
+    "@orpc/contract": "catalog:api",
+    "valibot": "catalog:api"
+  },
+  "devDependencies": {
+    "@repo/forge": "workspace:*",
+    "@tsconfig/strictest": "catalog:tooling",
+    "@types/node": "catalog:tooling"
+  }
+}

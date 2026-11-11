@@ -1,0 +1,35 @@
+{
+  "name": "@repo/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "types": "wrangler types",
+    "typecheck": "tsrs --noEmit --fast -p tsconfig.json && tsrs --noEmit --fast -p scripts/tsconfig.json",
+    "db:migrate": "wrangler d1 migrations apply turbo-remote-cache --local",
+    "db:migrate:remote": "wrangler d1 migrations apply turbo-remote-cache --remote",
+    "admin:setup": "node --env-file-if-exists=.dev.vars scripts/admin-setup.ts"
+  },
+  "dependencies": {
+    "@better-auth/api-key": "catalog:auth",
+    "@better-auth/passkey": "catalog:auth",
+    "@orpc/server": "catalog:api",
+    "@repo/api-contract": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "better-auth": "catalog:auth",
+    "drizzle-orm": "catalog:db",
+    "hono": "catalog:api",
+    "valibot": "catalog:api"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "catalog:cloudflare",
+    "@repo/forge": "workspace:*",
+    "@tsconfig/strictest": "catalog:tooling",
+    "@types/node": "catalog:tooling",
+    "vitest": "5.1.0",
+    "wrangler": "catalog:cloudflare"
+  }
+}

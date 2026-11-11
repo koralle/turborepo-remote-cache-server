@@ -1,0 +1,50 @@
+{
+  "name": "@repo/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "portless run --name turbo-cache vite --config vite.app.config.ts",
+    "build": "panda codegen && vite build --config vite.app.config.ts",
+    "preview": "vite preview --config vite.app.config.ts",
+    "deploy": "pnpm run build && wrangler deploy",
+    "typecheck": "panda codegen && tsrs --noEmit --fast",
+    "types": "wrangler types",
+    "storybook": "panda codegen && storybook dev -p 6006",
+    "storybook:build": "panda codegen && storybook build",
+    "generate": "panda codegen && node ../../scripts/panda-hash.ts",
+    "db:migrate": "wrangler d1 migrations apply turbo-remote-cache --local --persist-to \"$(pwd)/.wrangler/state\" -c ../api/wrangler.jsonc"
+  },
+  "dependencies": {
+    "@better-auth/passkey": "catalog:auth",
+    "@fontsource-variable/noto-sans-jp": "catalog:ui",
+    "@orpc/client": "catalog:api",
+    "@orpc/contract": "catalog:api",
+    "@pandacss/dev": "catalog:ui",
+    "@repo/api-contract": "workspace:*",
+    "@tanstack/react-query": "catalog:react",
+    "@tanstack/react-router": "catalog:react",
+    "@tanstack/react-start": "catalog:react",
+    "better-auth": "catalog:auth",
+    "react": "catalog:react",
+    "react-aria-components": "catalog:ui",
+    "react-dom": "catalog:react",
+    "react-error-boundary": "catalog:react"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:cloudflare",
+    "@pandacss/preset-base": "catalog:ui",
+    "@pandacss/preset-panda": "catalog:ui",
+    "@pandacss/vite": "catalog:ui",
+    "@repo/forge": "workspace:*",
+    "@storybook/react-vite": "catalog:ui",
+    "@tsconfig/strictest": "catalog:tooling",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "@vitejs/plugin-react": "catalog:react",
+    "portless": "catalog:tooling",
+    "storybook": "catalog:ui",
+    "vite": "catalog:cloudflare",
+    "wrangler": "catalog:cloudflare"
+  }
+}

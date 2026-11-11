@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turbo-remote-cache-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-07",
+  "observability": {
+    "enabled": true,
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "turbo-remote-cache",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "../../packages/db/drizzle",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "turbo-remote-cache",
+    },
+  ],
+  "vars": {
+    "MAX_ARTIFACT_BYTES": "104857600",
+    "WEB_ORIGIN": "",
+  },
+}
