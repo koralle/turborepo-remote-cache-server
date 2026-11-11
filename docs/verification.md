@@ -67,3 +67,7 @@ Chrome DevTools Protocol の `WebAuthn.addVirtualAuthenticator`（ctap2 / intern
 - GitHub Actions 上での実行（git remote が未設定）。
 - 本番 Cloudflare へのデプロイ（有料リソース作成の承認待ち）。
 - push / PR 作成（remote 未設定）。
+
+## 追記（2026-11-11）
+
+本番の公開経路は 2 ホスト（`admin.` / `cache.`）から、単一ホスト `turborepo.koralle-mgmg.com` の zone route に変更した。手順は README の本番デプロイランブックを正とする。このファイルの 2026-11-07 時点の記録は変更しない。

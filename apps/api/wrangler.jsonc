@@ -3,9 +3,29 @@
   "name": "turbo-remote-cache-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-07",
+  // workers.dev はパスキー RP ID と一致しない。Custom Domain はホスト全パスを 1 Worker に付ける。
+  "workers_dev": false,
   "observability": {
     "enabled": true,
+    "traces": {
+      "enabled": true,
+    },
   },
+  // より具体的な /v8・/artifacts・/health が Web の catch-all に勝つ。
+  "routes": [
+    {
+      "pattern": "turborepo.koralle-mgmg.com/v8/*",
+      "zone_name": "koralle-mgmg.com",
+    },
+    {
+      "pattern": "turborepo.koralle-mgmg.com/artifacts/*",
+      "zone_name": "koralle-mgmg.com",
+    },
+    {
+      "pattern": "turborepo.koralle-mgmg.com/health",
+      "zone_name": "koralle-mgmg.com",
+    },
+  ],
   "d1_databases": [
     {
       "binding": "DB",

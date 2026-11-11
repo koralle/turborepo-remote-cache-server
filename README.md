@@ -16,10 +16,11 @@
 | `packages/domain` | 純粋ロジック（R2 キー、権限、ヘッダー検証、team/slug 照合、セットアップトークン） |
 | `packages/forge` | 共有 tsconfig / lint / format 設定 |
 
-公開経路は 2 つ。
+公開経路はホスト 1 つ（`https://turborepo.koralle-mgmg.com`）。Cloudflare の Workers route で Worker を分ける。
 
-- Turborepo CLI → `https://<api-host>`（API Worker を直接公開。Bearer API キー）
-- ブラウザ → `https://<web-host>`（`/api/auth/*` と `/rpc/*` を同一オリジンで受け、Service Binding で API へ転送）
+- Turborepo CLI → `https://turborepo.koralle-mgmg.com/v8/*` と `/artifacts/*`（API Worker。Bearer API キー。Web を経由しない）
+- ブラウザ → それ以外のパス（Web Worker）。`/api/auth/*` と `/rpc/*` は同一オリジンで受け、Service Binding で API へ転送
+- `GET /health` も API Worker のより具体的な route（デプロイ後のスモーク用）
 
 ## 前提
 
@@ -92,7 +93,7 @@ pnpm db:migrate:remote  # 本番（Cloudflare の認証情報が必要）
 
 | クライアント | 例 | サーバー側 |
 | --- | --- | --- |
-| `TURBO_API` | `https://cache.example.com` | API Worker の公開 URL |
+| `TURBO_API` | `https://turborepo.koralle-mgmg.com` | 単一ホスト。CLI は `/v8` を付けて API Worker の route に届く |
 | `TURBO_TOKEN` | `trc_...` | API キー（Bearer） |
 | `TURBO_TEAM` | `acme/web` | キーに紐付くリポジトリの `slug`（または `teamId`） |
 
@@ -103,8 +104,8 @@ TURBO_TOKEN=trc_xxx \
 TURBO_TEAM=acme/web \
 pnpm turbo run build
 
-# 本番（API Worker を直接公開）
-TURBO_API=https://cache.example.com TURBO_TOKEN=trc_xxx TURBO_TEAM=acme/web pnpm turbo run build
+# 本番（/v8 は API Worker の zone route）
+TURBO_API=https://turborepo.koralle-mgmg.com TURBO_TOKEN=trc_xxx TURBO_TEAM=acme/web pnpm turbo run build
 ```
 
 - 実装パスは `/v8/artifacts/*`（Turbo CLI の実挙動）と接頭辞なしの `/artifacts/*` の両方。
@@ -138,24 +139,158 @@ npx wrangler r2 bucket lifecycle add turbo-remote-cache \
 
 CI では `pnpm install --frozen-lockfile` を使う。
 
-## デプロイ
+## 本番デプロイ（`turborepo.koralle-mgmg.com`）
+
+ゾーン `koralle-mgmg.com` はユーザーの Cloudflare アカウントにある前提。ホストは 1 つだけ使う。
+
+| パス | Worker | 備考 |
+| --- | --- | --- |
+| `/v8/*` | `turbo-remote-cache-api` | Turborepo CLI。Web を経由しない |
+| `/artifacts/*` | 同上 | 接頭辞なしキャッシュ API |
+| `/health` | 同上 | `{ "ok": true }`。認証なし |
+| それ以外 | `turbo-remote-cache-web` | 管理 UI。`/api/auth` と `/rpc` は Service Binding |
+
+Custom Domain（`custom_domain: true`）は使わない。ホスト名の全パスが 1 Worker に付くため、同一ホストで `/v8` を分けられない。zone route ならより具体的なパターンが勝つ。route の追加にはそのホストのプロキシ済み DNS が必要なので、初回はプレースホルダレコードを置く。
+
+デプロイそのものは GitHub Actions の **Deploy** ワークフローが行う。このリポジトリから `wrangler deploy`（dry-run 以外）は実行しない。
+
+### 1. Cloudflare リソース（初回）
 
 ```sh
 npx wrangler login
+
 npx wrangler d1 create turbo-remote-cache
+# 出力の database_id を控える
+
 npx wrangler r2 bucket create turbo-remote-cache
+
+npx wrangler r2 bucket lifecycle add turbo-remote-cache \
+  --prefix repos/ --expire-days 30
+# 保持期間。アプリ側に削除 API は無い
+
 npx wrangler secret put BETTER_AUTH_SECRET -c apps/api/wrangler.jsonc
-# GitHub Secrets: CLOUDFLARE_DATABASE_ID / CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID
-# GitHub Variables: PRODUCTION_WEB_ORIGIN（例 https://admin.example.com）
-# deploy ワークフローが wrangler.jsonc の database_id と WEB_ORIGIN を本番値に置き換える
+# 値は openssl rand -base64 32 など。ローカルの .dev.vars とは別の値にする
+```
+
+DNS（ダッシュボード → ゾーン `koralle-mgmg.com` → DNS → Records）:
+
+| 項目  | 値                    |
+| ----- | --------------------- |
+| Type  | `AAAA`                |
+| Name  | `turborepo`           |
+| IPv6  | `100::`               |
+| Proxy | Proxied（オレンジ雲） |
+
+実オリジンは無い。プレースホルダが Cloudflare にリクエストを渡し、Workers route が処理する。既存の CNAME がある場合は消す（route 用の AAAA と衝突する）。
+
+### 2. GitHub の設定（初回）
+
+Settings → Secrets and variables → Actions。Environment は Settings → Environments。
+
+| 種類 | 名前 | 値 |
+| --- | --- | --- |
+| Secret | `CLOUDFLARE_API_TOKEN` | 下表の権限を持つトークン |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | アカウント ID |
+| Secret | `CLOUDFLARE_DATABASE_ID` | `wrangler d1 create` の `database_id` |
+| Variable | `PRODUCTION_WEB_ORIGIN` | `https://turborepo.koralle-mgmg.com` |
+| Environment | `production` / `staging` | Required reviewers を設定（承認するまで実行されない） |
+
+`PRODUCTION_WEB_ORIGIN` は Web のホスト名と完全一致させる。Cookie・WebAuthn・Origin 検査・パスキーの RP ID（`turborepo.koralle-mgmg.com`）がすべてこの値に揃う。`prepare-production-config` はこれ以外の値を拒否する。
+
+`staging` を選んでも Worker 名・route・D1 / R2 は本番と同じ。初回は `production` を使う。
+
+#### `CLOUDFLARE_API_TOKEN` の権限
+
+User API Token（My Profile → API Tokens）。Account は対象アカウント、Zone は `koralle-mgmg.com`。
+
+| スコープ | 権限 | 用途 |
+| --- | --- | --- |
+| Account | Workers Scripts: Edit | Worker の新規作成とデプロイ（初回は未作成のため Edit が必要） |
+| Account | D1: Edit | `d1 migrations apply --remote` |
+| Account | Workers R2 Storage: Edit | R2 binding 付きのデプロイ |
+| Account | Account Settings: Read | `zone_name` からゾーンを引く |
+| Zone（`koralle-mgmg.com`） | Workers Routes: Edit | `wrangler.jsonc` の routes を追加・更新 |
+
+DNS レコードはダッシュボードで置くため、トークンに Zone DNS Edit は不要。シークレットの `BETTER_AUTH_SECRET` はローカルの `wrangler secret put` で入れ、トークンでは触らない。
+
+### 3. デプロイ実行
+
+GitHub Actions → **Deploy** → Run workflow → environment を `production` にする → 承認。
+
+順序は固定で、失敗すると後続は実行されない:
+
+1. `scripts/prepare-production-config.ts` — `database_id` と `WEB_ORIGIN` を本番値へ置換（置換対象が無ければ throw。`PRODUCTION_WEB_ORIGIN` がホストと違っても throw）
+2. `pnpm db:migrate:remote` — `packages/db/drizzle` を追記適用
+3. `pnpm deploy:api` — Service Binding の対象を先に作る
+4. `pnpm deploy:web`
+
+ローカルから同じことをする場合（このエージェントは実行しない）:
+
+```sh
+CLOUDFLARE_DATABASE_ID=<id> PRODUCTION_WEB_ORIGIN=https://turborepo.koralle-mgmg.com \
+  node scripts/prepare-production-config.ts
 pnpm db:migrate:remote
 pnpm deploy:api
 pnpm deploy:web
+git checkout -- apps/api/wrangler.jsonc   # 置換結果はコミットしない
 ```
 
-- 本番とローカルで D1 / R2 / Secret を分ける。`database_id` は `wrangler d1 create` の値に置き換える。
-- 管理 UI と API は別ホスト名で公開する。ブラウザの Cookie と WebAuthn は Web のオリジンに揃える。
-- `compatibility_date` は 2026-11-07。`nodejs_compat` は不要だったため付けていない。
+### 4. 管理者パスキーの登録（初回）
+
+```sh
+BETTER_AUTH_SECRET=<本番の値> WEB_ORIGIN=https://turborepo.koralle-mgmg.com pnpm admin:setup
+# 表示された https://turborepo.koralle-mgmg.com/setup#token=... を 10 分以内に開き、パスキーを登録する
+```
+
+環境変数はコマンドラインで渡す（`.dev.vars` があっても既存の環境変数は上書きされない）。復旧は `pnpm admin:setup -- --reset`。
+
+### 5. API キーと Turborepo の接続
+
+1. `https://turborepo.koralle-mgmg.com` にパスキーでログイン
+2. `/keys` でリポジトリ slug（例 `acme/web`）・権限・期限を指定してキーを発行（原文はこの 1 回だけ表示）
+3. 利用側リポジトリの CI に設定:
+
+```sh
+TURBO_API=https://turborepo.koralle-mgmg.com
+TURBO_TOKEN=trc_xxx
+TURBO_TEAM=acme/web
+```
+
+### 6. デプロイ後の確認
+
+```sh
+curl -s https://turborepo.koralle-mgmg.com/health
+# {"ok":true}
+
+curl -s -H "Authorization: Bearer $TURBO_TOKEN" \
+  https://turborepo.koralle-mgmg.com/v8/artifacts/status
+# {"status":"enabled"}
+
+curl -s -o /dev/null -w '%{http_code}\n' https://turborepo.koralle-mgmg.com/
+# 200（管理 UI）
+```
+
+- パスキーでログインでき、`/keys` で発行・失効できる
+- 実リポジトリで `pnpm turbo run build` を 2 回実行し、2 回目がリモート HIT になる（`--force` でミス時に PUT、出力削除で復元）
+- 失効したキーが 401、読み取り専用キーでの PUT が 403 になる
+- `/health` が Web の HTML ではなく `{"ok":true}` なら、API 側のより具体的な route が当たっている
+
+### 7. ロールバック
+
+```sh
+npx wrangler rollback -c apps/api/wrangler.jsonc   # 直前のバージョンに戻す
+npx wrangler rollback -c apps/web/wrangler.jsonc
+```
+
+DB は追記型マイグレーションのみなので巻き戻さない。アプリを戻しても旧スキーマで動く変更だけを入れる。route は Worker バージョンとは別に残る。
+
+### 注意点
+
+- `wrangler.jsonc` の `database_id` はリポジトリ上ダミー値。`prepare-production-config` を通さずにデプロイすると失敗する（意図したフェイルセーフ）
+- `BETTER_AUTH_SECRET` を変更すると既存セッションとパスキー登録用トークンが無効になる。`admin:setup` で再登録が必要
+- 本番では `WEB_ORIGIN` を固定する。空のままだとリクエストのオリジンを使うため、公衆経由で任意オリジンが通ってしまう
+- 初回デプロイ前に `turborepo` のプロキシ済み DNS が無いと、`wrangler deploy` の route 追加が失敗する
+- `compatibility_date` は 2026-11-07。`nodejs_compat` は不要だったため付けていない
 
 ## コマンド
 
@@ -192,5 +327,5 @@ pnpm deploy:web
 - OpenAPI のコード生成は使わない。仕様を `packages/api-contract/spec/` に保存し、型と Valibot スキーマを手書きする（TypeScript 7 を優先するため）。
 - DB は D1。ローカルと統合テストが追加サービス無しで完結する。
 - 管理者はパスキーのみ。初期登録・復旧は署名トークン + `/setup`。
-- Turborepo の公開経路は API Worker の直接公開。大きいバイナリを Web に通さない。
+- Turborepo の公開経路は同一ホストの zone route。大きいバイナリを Web に通さない。
 - 詳細と比較表は `docs/design.md`。
