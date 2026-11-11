@@ -37,5 +37,6 @@ jobs:
           CLOUDFLARE_DATABASE_ID: ${{ secrets.CLOUDFLARE_DATABASE_ID }}
           PRODUCTION_WEB_ORIGIN: ${{ vars.PRODUCTION_WEB_ORIGIN }}
       - run: pnpm run db:migrate:remote
+      # Web の Service Binding はデプロイ済みの API Worker を要求する。
       - run: pnpm run deploy:api
       - run: pnpm run deploy:web

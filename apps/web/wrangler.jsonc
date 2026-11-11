@@ -3,9 +3,21 @@
   "name": "turbo-remote-cache-web",
   "main": "src/server.ts",
   "compatibility_date": "2026-11-07",
+  // workers.dev はパスキー RP ID と一致しない。
+  "workers_dev": false,
   "observability": {
     "enabled": true,
+    "traces": {
+      "enabled": true,
+    },
   },
+  // 管理 UI。同じホストのより具体的な API route が CLI を先に取る。
+  "routes": [
+    {
+      "pattern": "turborepo.koralle-mgmg.com/*",
+      "zone_name": "koralle-mgmg.com",
+    },
+  ],
   "services": [
     {
       "binding": "API",

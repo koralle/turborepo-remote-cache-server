@@ -1,11 +1,11 @@
 # 設計
 
-最終更新: 2026-11-07。決定済みの内容と、その理由を残す。
+最終更新: 2026-11-11。決定済みの内容と、その理由を残す。
 
 ## 1. 結論（推奨案）
 
 1. DB は **Cloudflare D1**。
-2. Turborepo CLI の公開経路は **API Worker を直接 HTTPS 公開**（`TURBO_API`）。Web はブラウザ向けの認証・管理 API だけを同一オリジンで受けて Service Binding 転送する。
+2. Turborepo CLI の公開経路は **同一ホスト上の Workers zone route**（`/v8/*` と `/artifacts/*` を API Worker へ。Web を経由しない）。Web はブラウザ向けの認証・管理 API だけを同一オリジンで受けて Service Binding 転送する。
 3. 管理者ログインは **パスキーのみ**。公開サインアップは無効。初期登録と復旧は CLI が署名した一時トークン + `/setup`。
 4. API キー 1 本 = 1 リポジトリ。権限は `cache:read` と `cache:read + cache:write` の 2 種。
 5. コード生成ツール（Hey API など）は使わない。仕様は vendoring し、TypeScript の型と Valibot スキーマは仕様から手書きする。TypeScript は 7 系。
@@ -14,13 +14,16 @@
 ## 2. 全体構成
 
 ```text
+https://turborepo.koralle-mgmg.com
+
 Turborepo CLI (local / GitHub Actions)
-  └─ HTTPS  https://cache.<domain>          … API Worker（公開）
+  └─ HTTPS  /v8/* と /artifacts/*           … API Worker（zone route）
        GET/HEAD/PUT /v8/artifacts/*         … Bearer API キー
        GET /v8/artifacts/status
        POST /v8/artifacts, /v8/artifacts/events
+       GET /health                          … スモーク（認証なし）
 
-ブラウザ  https://admin.<domain>            … Web Worker（TanStack Start）
+ブラウザ  それ以外のパス                    … Web Worker（TanStack Start、catch-all route）
   ├─ /api/auth/*  ─┐
   ├─ /rpc/*       ─┴─ Service Binding ──▶ API Worker
   └─ 管理画面（キー発行・一覧・失効）
@@ -117,10 +120,13 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 
 ## 6. 公開経路
 
-- **本番（想定）**: API Worker を `cache.<domain>`（カスタムドメイン）または `<name>.<account>.workers.dev` に公開。`TURBO_API=https://cache.<domain>`、`TURBO_TOKEN=<API キー>`、`TURBO_TEAM=<リポジトリ slug>`。
+- **本番**: ホストは `turborepo.koralle-mgmg.com` のみ。`TURBO_API=https://turborepo.koralle-mgmg.com`、`TURBO_TOKEN=<API キー>`、`TURBO_TEAM=<リポジトリ slug>`。`PRODUCTION_WEB_ORIGIN` も同じオリジン。
+  - API Worker の zone route: `/v8/*`、`/artifacts/*`、`/health`。より具体的なパターンが勝つので CLI は Web を通らない。
+  - Web Worker の zone route: `/*`（残り全部）。
+  - Custom Domain は使わない。ホスト全パスが 1 Worker になり、パス分割できない。route にはプロキシ済み DNS が必要なので、初回は `AAAA 100::` を置く。
 - **ローカル**: Web は portless 経由で `https://<branch>.turbo-cache.localhost`（ポートは 4000-4999 から自動割当）。API は Vite の `auxiliaryWorkers` で同時起動する。Web が `/v8` と `/artifacts` も Service Binding で API に転送するため、`TURBO_API=https://turbo-cache.localhost` で CLI から到達できる。D1 は Vite の永続化先 `apps/web/.wrangler/state/v3` を使い、`pnpm dev` が起動前にマイグレーションする。API 単体や E2E は `apps/api/.wrangler/state/v3` を使う。`PORTLESS=0 pnpm dev` で port 3000 の従来動作に戻る。
 - ブラウザからは Web の同一オリジンのみ。`/api/auth/*` と `/rpc/*` を Service Binding（`env.API.fetch`）で API に転送し、Cookie と `Set-Cookie` をそのまま通す。
-- API Worker の `baseURL` は Web のオリジン。`trustedOrigins` も Web のオリジン。本番は `WEB_ORIGIN` に固定し、ローカルは `WEB_ORIGIN` を空にしてリクエストのオリジン（portless の URL）を都度使う。Cookie は `HttpOnly`、`SameSite=Lax`、本番は `Secure`。
+- API Worker の `baseURL` は Web のオリジン。`trustedOrigins` も Web のオリジン。本番は `WEB_ORIGIN` に固定し、ローカルは `WEB_ORIGIN` を空にしてリクエストのオリジン（portless の URL）を都度使う。Cookie は `HttpOnly`、`SameSite=Lax`、本番は `Secure`。パスキーの RP ID は `turborepo.koralle-mgmg.com`。
 - oRPC の変更系は `Origin` ヘッダー一致を追加で確認する。
 - Turborepo CLI はブラウザではないので CORS は必須ではないが、プリフライトを送る構成でも動くようキャッシュ経路に OPTIONS を実装する。
 - 公開経路の検証: `curl` で Authorization・`Content-Length`・`x-artifact-tag` が往復すること、実 Turborepo で保存・復元できることを確認する。
@@ -215,7 +221,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 ## 12. CI・デプロイ
 
 - CI: lint / format / typecheck / test / knip / build / storybook build、codegen 再生成差分、既存マイグレーション変更禁止。`pnpm install --frozen-lockfile`、`permissions: contents: read`、PR ではシークレットなし。
-- デプロイ: `workflow_dispatch`（environment 承認）+ `concurrency`。migration → API → Web の順、失敗で後続停止。main push の自動本番デプロイは作らない。
+- デプロイ: `workflow_dispatch`（environment 承認）+ `concurrency`。migration → API → Web の順、失敗で後続停止。API を先にするのは Web の Service Binding が対象 Worker の存在を要求するため。main push の自動本番デプロイは作らない。本番ホストは `turborepo.koralle-mgmg.com`。route は `wrangler.jsonc` に固定する。
 - `compatibility_date` は 2026-11-07。`nodejs_compat` は必要になった場合だけ。
 - binding 型は `wrangler types` で生成。
 - ローカルと本番で D1 / R2 / Secret を分ける（`wrangler.jsonc` の env / `.dev.vars`）。
@@ -234,6 +240,7 @@ Turso を選ぶ場合の構成（代替案）: `@libsql/client` の HTTP クラ�
 
 - 2026-11-07: DB は D1（Turso/libSQL は不採用）。
 - 2026-11-07: Turborepo CLI は API Worker の直接公開経路を使う。
+- 2026-11-11: 本番ホストは `turborepo.koralle-mgmg.com` のみ。CLI は zone route で API Worker へ。Custom Domain は使わない。
 - 2026-11-07: 管理者はパスキーのみ。初期登録・復旧は署名済みトークン + `/setup`。
 - 2026-11-07: API キーの権限は read / read+write の 2 種。
 - 2026-11-07: teamId / slug は一致確認のみ、未指定は許可。

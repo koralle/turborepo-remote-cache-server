@@ -1,18 +1,37 @@
 import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 
-const { CLOUDFLARE_DATABASE_ID: databaseId, PRODUCTION_WEB_ORIGIN: origin } =
-  process.env;
+import { productionHostname, productionWebOrigin } from "./production.ts";
 
-if (databaseId === undefined || databaseId === "") {
-  throw new Error("CLOUDFLARE_DATABASE_ID が必要");
-}
+const apiConfigPath = "apps/api/wrangler.jsonc";
 
-if (origin === undefined || !origin.startsWith("https://")) {
-  throw new Error("PRODUCTION_WEB_ORIGIN は https:// で始まる必要がある");
-}
+export const applyProductionConfig = async (
+  file: string,
+  databaseId: string,
+  origin: string
+): Promise<void> => {
+  if (databaseId === "") {
+    throw new Error("CLOUDFLARE_DATABASE_ID が必要");
+  }
 
-const rewrite = async (file: string): Promise<void> => {
+  if (origin !== productionWebOrigin) {
+    throw new Error(
+      `PRODUCTION_WEB_ORIGIN は ${productionWebOrigin} である必要がある（パスキー RP ID と routes がこのホストに固定）`
+    );
+  }
+
   const original = await readFile(file, "utf-8");
+
+  if (
+    !original.includes(`"${productionHostname}/v8/*"`) ||
+    !original.includes(`"${productionHostname}/artifacts/*"`) ||
+    !original.includes(`"${productionHostname}/health"`)
+  ) {
+    throw new Error(
+      `${file} の routes が ${productionHostname} のパス分割と一致しない`
+    );
+  }
 
   const replacements: [from: string, to: string][] = [
     [
@@ -36,4 +55,36 @@ const rewrite = async (file: string): Promise<void> => {
   await writeFile(file, config);
 };
 
-await rewrite("apps/api/wrangler.jsonc");
+const applyFromEnv = async (): Promise<void> => {
+  const { CLOUDFLARE_DATABASE_ID: databaseId, PRODUCTION_WEB_ORIGIN: origin } =
+    process.env;
+
+  if (databaseId === undefined) {
+    throw new Error("CLOUDFLARE_DATABASE_ID が必要");
+  }
+
+  if (origin === undefined) {
+    throw new Error("PRODUCTION_WEB_ORIGIN は https:// で始まる必要がある");
+  }
+
+  await applyProductionConfig(apiConfigPath, databaseId, origin);
+};
+
+const isExecutedDirectly = (): boolean => {
+  const [, entry] = process.argv;
+
+  if (entry === undefined) {
+    return false;
+  }
+
+  return import.meta.url === pathToFileURL(path.resolve(entry)).href;
+};
+
+if (isExecutedDirectly()) {
+  try {
+    await applyFromEnv();
+  } catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+  }
+}

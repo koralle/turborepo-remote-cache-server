@@ -1,7 +1,8 @@
 import handler from "@tanstack/react-start/server-entry";
 import { env } from "cloudflare:workers";
 
-const proxied = ["/api/auth", "/rpc", "/v8", "/artifacts"];
+// 本番の zone route は CLI を Web に通さない。dev にはその route が無い。
+const proxied = ["/api/auth", "/rpc", "/v8", "/artifacts", "/health"];
 
 const isProxied = (pathname: string): boolean =>
   proxied.some(
